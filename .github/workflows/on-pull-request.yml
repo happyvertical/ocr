@@ -97,3 +97,6 @@ jobs:
   test:
     name: Validate Changes
     uses: ./.github/workflows/test.yml
+    secrets:
+      HAVE_RELEASE_APP_ID: ${{ secrets.HAVE_RELEASE_APP_ID }}
+      HAVE_RELEASE_APP_PRIVATE_KEY: ${{ secrets.HAVE_RELEASE_APP_PRIVATE_KEY }}
