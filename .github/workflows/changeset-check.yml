@@ -7,6 +7,7 @@ on:
 permissions:
   pull-requests: read
   contents: read
+  packages: read
 
 jobs:
   check:
@@ -53,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         env:
-          NODE_AUTH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changeset
         env:
