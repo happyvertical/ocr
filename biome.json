@@ -1,10 +1,9 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "files": {
-    "includes": [
-      "src/**/*.{js,ts,tsx,jsx}",
-      "test/**/*.{js,ts,tsx,jsx}",
-      "*.{js,ts,tsx,jsx}"
+    "include": [
+      "src/**/*.ts",
+      "test/**/*.ts"
     ],
     "ignoreUnknown": true
   },
@@ -30,8 +29,7 @@
       },
       "correctness": {
         "noUnusedVariables": "warn",
-        "noUnusedImports": "warn",
-        "useParseIntRadix": "warn"
+        "noUnusedImports": "warn"
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -84,7 +82,7 @@
   },
   "overrides": [
     {
-      "includes": [
+      "include": [
         "**/*.test.ts",
         "**/*.test.tsx",
         "**/*.spec.ts",
@@ -110,7 +108,7 @@
       }
     },
     {
-      "includes": [
+      "include": [
         "**/vite.config.ts",
         "**/vitest.config.ts",
         "**/*.config.ts",

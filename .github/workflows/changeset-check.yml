@@ -7,6 +7,7 @@ on:
 permissions:
   pull-requests: read
   contents: read
+  packages: read
 
 jobs:
   check:
@@ -14,6 +15,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.HAVE_RELEASE_APP_ID }}
+          private-key: ${{ secrets.HAVE_RELEASE_APP_PRIVATE_KEY }}
+          owner: happyvertical
+        continue-on-error: true
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -27,8 +37,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Get pnpm store directory
         shell: bash
