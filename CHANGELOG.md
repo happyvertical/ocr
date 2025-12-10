@@ -1,5 +1,27 @@
 # @happyvertical/ocr
 
+## 0.60.3
+
+### Patch Changes
+
+- ### Features
+
+  - add auto-changeset and direct publish workflow (ci)
+  - graduate @happyvertical/ocr to standalone repo
+
+  ### Bug Fixes
+
+  - use GH_TOKEN org secret for npm publish (release)
+  - use GITHUB_TOKEN for npm publish to GitHub Packages (release)
+  - include root package in pnpm workspace for changesets (release)
+  - update biome.json for biome 2.x compatibility (ocr)
+  - use 'includes' instead of 'include' in biome.json overrides (ocr)
+  - add packages:read permission for GitHub Packages auth (deps)
+  - scope GitHub App token to organization for package access (ocr)
+  - use GitHub App token for package registry access (ocr)
+  - resolve workflow issues for pnpm and commitlint (ocr)
+  - update biome.json for v1.9.4 compatibility (ocr)
+
 ## 0.60.2
 
 ### Patch Changes
