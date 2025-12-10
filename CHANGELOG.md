@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.4
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - add workflow_dispatch trigger to publish workflow (release)
+
 ## 0.60.3
 
 ### Patch Changes
