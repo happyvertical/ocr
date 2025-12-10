@@ -1,0 +1,82 @@
+{
+  "name": "@happyvertical/ocr",
+  "version": "0.60.2",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@gutenye/ocr-node": "^1.4.8",
+    "@happyvertical/utils": "^0.60.2",
+    "jpeg-js": "0.4.4",
+    "pngjs": "7.0.0",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.29.8",
+    "@types/node": "24.10.0",
+    "@types/pngjs": "6.0.5",
+    "typescript": "^5.9.3",
+    "vite": "7.2.7",
+    "vite-plugin-dts": "4.5.4",
+    "vitest": "^4.0.8"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "description": "Standardized OCR interface with support for multiple providers including Tesseract.js and ONNX (PaddleOCR)",
+  "keywords": [
+    "ocr",
+    "optical-character-recognition",
+    "text-extraction",
+    "tesseract",
+    "onnx",
+    "paddleocr",
+    "image-to-text",
+    "text-recognition",
+    "multi-provider",
+    "typescript",
+    "browser",
+    "nodejs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/happyvertical/ocr.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/happyvertical/ocr/issues"
+  },
+  "homepage": "https://github.com/happyvertical/ocr#readme",
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run --testTimeout 120000",
+    "test:watch": "vitest --testTimeout 120000",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/",
+    "format": "biome format --write src/",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "dev": "npm run build:watch & npm run test:watch",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish"
+  }
+}
