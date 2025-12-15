@@ -14,7 +14,7 @@
     "@happyvertical/utils": "^0.60.2",
     "jpeg-js": "0.4.4",
     "pngjs": "7.0.0",
-    "tesseract.js": "^6.0.1"
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
