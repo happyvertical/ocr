@@ -85,8 +85,10 @@ export * from './shared/types';
 // The factory will handle environment-specific provider selection
 
 export type {
+  LiteLLMAuthType,
   LiteLLMOutputMode,
   LiteLLMProviderConfig,
+  OAuth2Config,
 } from './node/litellm';
 // Export LiteLLM provider for direct instantiation
 export { LiteLLMProvider } from './node/litellm';

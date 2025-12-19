@@ -71,13 +71,38 @@ import { OCRProcessingError } from '../shared/types';
 export type LiteLLMOutputMode = 'simple' | 'structured';
 
 /**
+ * Authentication type for LiteLLM provider
+ * - 'api_key': Static API key authentication (default)
+ * - 'oauth2': OAuth2 client credentials flow (e.g., Keycloak)
+ */
+export type LiteLLMAuthType = 'api_key' | 'oauth2';
+
+/**
+ * OAuth2 configuration for client credentials flow
+ */
+export interface OAuth2Config {
+  /** Token endpoint URL (e.g., https://auth.example.com/realms/myrealm/protocol/openid-connect/token) */
+  tokenUrl: string;
+  /** OAuth2 client ID */
+  clientId: string;
+  /** OAuth2 client secret */
+  clientSecret: string;
+  /** Optional additional scopes */
+  scopes?: string[];
+}
+
+/**
  * Configuration for LiteLLM provider
  */
 export interface LiteLLMProviderConfig {
   /** LiteLLM/DeepSeek API base URL */
   baseUrl?: string;
-  /** API key for authentication */
+  /** Authentication type: 'api_key' (default) or 'oauth2' */
+  authType?: LiteLLMAuthType;
+  /** API key for authentication (when authType is 'api_key') */
   apiKey?: string;
+  /** OAuth2 configuration (when authType is 'oauth2') */
+  oauth2?: OAuth2Config;
   /** Model to use (e.g., 'deepseek-chat', 'gpt-4o') */
   model?: string;
   /** Output mode: 'simple' for text-only, 'structured' for JSON with confidence */
@@ -93,11 +118,36 @@ export interface LiteLLMProviderConfig {
  */
 const ENV_VARS = {
   baseUrl: 'HAVE_OCR_LITELLM_BASE_URL',
+  authType: 'HAVE_OCR_LITELLM_AUTH_TYPE',
   apiKey: 'HAVE_OCR_LITELLM_API_KEY',
+  oauth2TokenUrl: 'HAVE_OCR_LITELLM_OAUTH2_TOKEN_URL',
+  oauth2ClientId: 'HAVE_OCR_LITELLM_OAUTH2_CLIENT_ID',
+  oauth2ClientSecret: 'HAVE_OCR_LITELLM_OAUTH2_CLIENT_SECRET',
+  oauth2Scopes: 'HAVE_OCR_LITELLM_OAUTH2_SCOPES',
   model: 'HAVE_OCR_LITELLM_MODEL',
   outputMode: 'HAVE_OCR_LITELLM_OUTPUT_MODE',
   timeout: 'HAVE_OCR_LITELLM_TIMEOUT',
 } as const;
+
+/**
+ * Cached OAuth2 token
+ */
+interface CachedToken {
+  accessToken: string;
+  expiresAt: number; // Unix timestamp in ms
+}
+
+/**
+ * OAuth2 token response from token endpoint
+ */
+interface OAuth2TokenResponse {
+  // biome-ignore lint/style/useNamingConvention: OAuth2 standard field name
+  access_token: string;
+  // biome-ignore lint/style/useNamingConvention: OAuth2 standard field name
+  expires_in?: number;
+  // biome-ignore lint/style/useNamingConvention: OAuth2 standard field name
+  token_type?: string;
+}
 
 const DEFAULT_SYSTEM_PROMPT_SIMPLE = `You are an OCR assistant. Extract all visible text from the provided image(s).
 Return ONLY the extracted text, preserving the original layout as much as possible.
@@ -139,7 +189,7 @@ If there is no text, return: {"text": "", "segments": []}`;
  * - Azure OpenAI
  * - Any other OpenAI-compatible vision model endpoint
  *
- * @example Basic usage
+ * @example Basic usage with API key
  * ```typescript
  * const provider = new LiteLLMProvider({
  *   baseUrl: 'http://localhost:4000/v1',
@@ -149,6 +199,20 @@ If there is no text, return: {"text": "", "segments": []}`;
  *
  * const result = await provider.performOCR([{ data: imageBuffer }]);
  * console.log(result.text);
+ * ```
+ *
+ * @example With OAuth2 authentication (Keycloak)
+ * ```typescript
+ * const provider = new LiteLLMProvider({
+ *   baseUrl: 'https://litellm.example.com/v1',
+ *   authType: 'oauth2',
+ *   oauth2: {
+ *     tokenUrl: 'https://auth.example.com/realms/myrealm/protocol/openid-connect/token',
+ *     clientId: 'my-client',
+ *     clientSecret: 'my-secret'
+ *   },
+ *   model: 'deepseek-ocr'
+ * });
  * ```
  *
  * @example With structured output
@@ -166,13 +230,49 @@ If there is no text, return: {"text": "", "segments": []}`;
 export class LiteLLMProvider implements OCRProvider {
   readonly name = 'litellm';
 
-  private config: Required<LiteLLMProviderConfig>;
+  private config: Required<Omit<LiteLLMProviderConfig, 'oauth2' | 'authType'>>;
+  private authType: LiteLLMAuthType;
+  private oauth2Config: OAuth2Config | null = null;
+  private cachedToken: CachedToken | null = null;
   private aiClient: AIInterface | null = null;
 
   constructor(config: LiteLLMProviderConfig = {}) {
     // Load from environment variables, with constructor options taking precedence
     const envOutputMode = process.env[ENV_VARS.outputMode];
     const envTimeout = process.env[ENV_VARS.timeout];
+    const envAuthType = process.env[ENV_VARS.authType];
+
+    // Determine auth type
+    this.authType =
+      config.authType ??
+      ((envAuthType === 'oauth2' ? 'oauth2' : 'api_key') as LiteLLMAuthType);
+
+    // Load OAuth2 config from env vars or constructor
+    if (this.authType === 'oauth2') {
+      const envTokenUrl = process.env[ENV_VARS.oauth2TokenUrl];
+      const envClientId = process.env[ENV_VARS.oauth2ClientId];
+      const envClientSecret = process.env[ENV_VARS.oauth2ClientSecret];
+      const envScopes = process.env[ENV_VARS.oauth2Scopes];
+
+      const oauth2FromEnv: OAuth2Config | null =
+        envTokenUrl && envClientId && envClientSecret
+          ? {
+              tokenUrl: envTokenUrl,
+              clientId: envClientId,
+              clientSecret: envClientSecret,
+              scopes: envScopes?.split(','),
+            }
+          : null;
+
+      this.oauth2Config = config.oauth2 ?? oauth2FromEnv;
+
+      if (!this.oauth2Config) {
+        throw new Error(
+          'OAuth2 configuration required when authType is "oauth2". ' +
+            'Provide oauth2 config or set HAVE_OCR_LITELLM_OAUTH2_* environment variables.',
+        );
+      }
+    }
 
     this.config = {
       baseUrl:
@@ -197,17 +297,95 @@ export class LiteLLMProvider implements OCRProvider {
   }
 
   /**
+   * Fetch OAuth2 access token using client credentials flow
+   */
+  private async fetchOAuth2Token(): Promise<string> {
+    if (!this.oauth2Config) {
+      throw new Error('OAuth2 configuration not available');
+    }
+
+    // Check if cached token is still valid (with 60s buffer)
+    if (
+      this.cachedToken &&
+      this.cachedToken.expiresAt > Date.now() + 60 * 1000
+    ) {
+      return this.cachedToken.accessToken;
+    }
+
+    const { tokenUrl, clientId, clientSecret, scopes } = this.oauth2Config;
+
+    const params = new URLSearchParams({
+      // biome-ignore lint/style/useNamingConvention: OAuth2 standard parameter
+      grant_type: 'client_credentials',
+      // biome-ignore lint/style/useNamingConvention: OAuth2 standard parameter
+      client_id: clientId,
+      // biome-ignore lint/style/useNamingConvention: OAuth2 standard parameter
+      client_secret: clientSecret,
+    });
+
+    if (scopes && scopes.length > 0) {
+      params.set('scope', scopes.join(' '));
+    }
+
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `OAuth2 token request failed: ${response.status} ${response.statusText} - ${errorText}`,
+      );
+    }
+
+    const data: OAuth2TokenResponse = await response.json();
+
+    // Cache the token
+    const expiresIn = data.expires_in ?? 3600; // Default to 1 hour if not specified
+    this.cachedToken = {
+      accessToken: data.access_token,
+      expiresAt: Date.now() + expiresIn * 1000,
+    };
+
+    return data.access_token;
+  }
+
+  /**
+   * Get the API key to use for authentication
+   * For OAuth2, this fetches a fresh token; for API key auth, returns the static key
+   */
+  private async getAuthToken(): Promise<string> {
+    if (this.authType === 'oauth2') {
+      return this.fetchOAuth2Token();
+    }
+    return this.config.apiKey;
+  }
+
+  /**
    * Initialize the AI client lazily
+   * For OAuth2 auth, fetches a fresh token before creating client
    */
   private async getAIClient(): Promise<AIInterface> {
-    if (this.aiClient) {
+    // Get fresh auth token (handles both OAuth2 and static API key)
+    const authToken = await this.getAuthToken();
+
+    // For OAuth2, we need to recreate the client if the token changed
+    // since the token is passed as apiKey to the OpenAI-compatible client
+    if (
+      this.aiClient &&
+      this.authType === 'api_key' // Only cache for static API key
+    ) {
       return this.aiClient;
     }
 
     this.aiClient = await getAI({
       type: 'openai', // LiteLLM is OpenAI-compatible
       baseUrl: this.config.baseUrl,
-      apiKey: this.config.apiKey,
+      apiKey: authToken, // Use dynamic token instead of static apiKey
       defaultModel: this.config.model,
       timeout: this.config.timeout,
     });
@@ -335,9 +513,9 @@ export class LiteLLMProvider implements OCRProvider {
       for (const image of images) {
         const dataUrl = this.imageToDataUrl(image);
         if (dataUrl) {
-          // biome-ignore lint/style/useNamingConvention: OpenAI API format
           contentParts.push({
             type: 'image_url',
+            // biome-ignore lint/style/useNamingConvention: OpenAI API format
             image_url: { url: dataUrl, detail: 'high' },
           });
         }
@@ -507,18 +685,37 @@ export class LiteLLMProvider implements OCRProvider {
   }
 
   async checkDependencies(): Promise<DependencyCheckResult> {
-    // Check if API key is configured
-    if (!this.config.apiKey) {
-      return {
-        available: false,
-        error:
-          'LiteLLM API key not configured. Set HAVE_OCR_LITELLM_API_KEY environment variable or pass apiKey in constructor options.',
-        details: {
-          apiKey: false,
-          baseUrl: this.config.baseUrl,
-          model: this.config.model,
-        },
-      };
+    // Check authentication configuration based on auth type
+    if (this.authType === 'oauth2') {
+      // OAuth2: check if OAuth2 config is complete
+      if (!this.oauth2Config) {
+        return {
+          available: false,
+          error:
+            'LiteLLM OAuth2 configuration incomplete. Set HAVE_OCR_LITELLM_OAUTH2_* environment variables or pass oauth2 config in constructor options.',
+          details: {
+            authType: 'oauth2',
+            oauth2Configured: false,
+            baseUrl: this.config.baseUrl,
+            model: this.config.model,
+          },
+        };
+      }
+    } else {
+      // API key: check if API key is configured
+      if (!this.config.apiKey) {
+        return {
+          available: false,
+          error:
+            'LiteLLM API key not configured. Set HAVE_OCR_LITELLM_API_KEY environment variable or pass apiKey in constructor options.',
+          details: {
+            authType: 'api_key',
+            apiKey: false,
+            baseUrl: this.config.baseUrl,
+            model: this.config.model,
+          },
+        };
+      }
     }
 
     // Try to initialize the client to verify connectivity
@@ -527,7 +724,10 @@ export class LiteLLMProvider implements OCRProvider {
       return {
         available: true,
         details: {
-          apiKey: true,
+          authType: this.authType,
+          ...(this.authType === 'oauth2'
+            ? { oauth2Configured: true, tokenUrl: this.oauth2Config?.tokenUrl }
+            : { apiKey: true }),
           baseUrl: this.config.baseUrl,
           model: this.config.model,
           outputMode: this.config.outputMode,
@@ -538,7 +738,10 @@ export class LiteLLMProvider implements OCRProvider {
         available: false,
         error: `Failed to initialize LiteLLM client: ${(error as Error).message}`,
         details: {
-          apiKey: !!this.config.apiKey,
+          authType: this.authType,
+          ...(this.authType === 'oauth2'
+            ? { oauth2Configured: !!this.oauth2Config }
+            : { apiKey: !!this.config.apiKey }),
           baseUrl: this.config.baseUrl,
           model: this.config.model,
         },
@@ -602,5 +805,6 @@ export class LiteLLMProvider implements OCRProvider {
 
   async cleanup(): Promise<void> {
     this.aiClient = null;
+    this.cachedToken = null;
   }
 }
