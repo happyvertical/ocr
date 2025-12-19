@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.6
+
+### Patch Changes
+
+- ### Features
+
+  - add OAuth2 client credentials authentication to LiteLLM (ocr)
+
 ## 0.60.5
 
 ### Patch Changes
