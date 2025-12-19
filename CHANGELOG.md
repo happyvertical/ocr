@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.5
+
+### Patch Changes
+
+- ### Features
+
+  - add LiteLLM provider for vision LLM-based text extraction (ocr)
+
 ## 0.60.4
 
 ### Patch Changes
