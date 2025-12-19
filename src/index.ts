@@ -84,6 +84,13 @@ export * from './shared/types';
 // Note: Only export providers available in current environment
 // The factory will handle environment-specific provider selection
 
+export type {
+  LiteLLMOutputMode,
+  LiteLLMProviderConfig,
+} from './node/litellm';
+// Export LiteLLM provider for direct instantiation
+export { LiteLLMProvider } from './node/litellm';
+
 // Default export for convenience
 export { getOCR as default } from './shared/factory';
 

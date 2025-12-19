@@ -233,6 +233,14 @@ export class OCRFactory {
         } catch {
           // Ignore if ONNX provider fails to load
         }
+
+        // LiteLLM provider (Node.js only) - uses vision LLMs for OCR
+        try {
+          const { LiteLLMProvider } = await import('../node/litellm.js');
+          this.providers.set('litellm', new LiteLLMProvider());
+        } catch {
+          // Ignore if LiteLLM provider fails to load
+        }
       } else if (this.environment === 'browser') {
         // Browser-specific providers
         try {
@@ -349,7 +357,8 @@ export class OCRFactory {
    */
   private getDefaultProviderPriority(): string[] {
     if (this.environment === 'node') {
-      return ['onnx', 'tesseract'];
+      // LiteLLM last since it's API-based (network latency, costs money)
+      return ['onnx', 'tesseract', 'litellm'];
     }
     if (this.environment === 'browser') {
       return ['tesseract', 'web-ocr'];

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@gutenye/ocr-node": "^1.4.8",
+    "@happyvertical/ai": "^0.60.5",
     "@happyvertical/utils": "^0.60.2",
     "jpeg-js": "0.4.4",
     "pngjs": "7.0.0",
@@ -44,6 +45,8 @@
     "tesseract",
     "onnx",
     "paddleocr",
+    "litellm",
+    "vision-llm",
     "image-to-text",
     "text-recognition",
     "multi-provider",

@@ -268,3 +268,34 @@ export interface ProviderCompatibility {
   supported: boolean;
   reason?: string;
 }
+
+/**
+ * LiteLLM provider configuration options
+ *
+ * Configuration for the LiteLLM OCR provider which uses vision-capable LLMs
+ * for text extraction. Works with any OpenAI-compatible API endpoint.
+ *
+ * @example
+ * ```typescript
+ * const options: LiteLLMProviderOptions = {
+ *   baseUrl: 'http://localhost:4000/v1',
+ *   apiKey: 'your-api-key',
+ *   model: 'deepseek-ocr',
+ *   outputMode: 'structured'
+ * };
+ * ```
+ */
+export interface LiteLLMProviderOptions {
+  /** LiteLLM/DeepSeek API base URL */
+  baseUrl?: string;
+  /** API key for authentication */
+  apiKey?: string;
+  /** Model to use (e.g., 'deepseek-chat', 'gpt-4o') */
+  model?: string;
+  /** Output mode: 'simple' for text-only, 'structured' for JSON with confidence */
+  outputMode?: 'simple' | 'structured';
+  /** Custom system prompt (overrides default) */
+  systemPrompt?: string;
+  /** Request timeout in milliseconds */
+  timeout?: number;
+}
