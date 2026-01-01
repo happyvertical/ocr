@@ -15,8 +15,8 @@ importers:
         specifier: ^0.60.5
         version: 0.60.5(ws@8.18.3)
       '@happyvertical/utils':
-        specifier: ^0.60.2
-        version: 0.60.2
+        specifier: ^0.66.0
+        version: 0.66.0
       jpeg-js:
         specifier: 0.4.4
         version: 0.4.4
@@ -594,11 +594,11 @@ packages:
   '@happyvertical/ai@0.60.5':
     resolution: {integrity: sha512-q0vha/y1CpP6Aw81P03czmP4P7+qZMTkwbBdq6CAP2dC0UKOeH+QbcjzpMQboHeQpgK+wmY1DrQ1zq8gIZ75xQ==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.60.5/0f681bab349d0fdd78fb8271832451f2f28cac63}
 
-  '@happyvertical/utils@0.60.2':
-    resolution: {integrity: sha512-O545bmkf++TAfCP/MbXV/U0ucx+6TRi4dsiOpOO92xnu6N8kNPBVsZ2Kt+M1XBwhRLuhE0Y0lBBpXFm021+18A==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.60.2/0e25ff142cbf8c3e24c7cfa014b0a1155896fe8f}
-
   '@happyvertical/utils@0.60.5':
     resolution: {integrity: sha512-foh5qcPDRe73XaGX0too3RfuZeciasKE+K2NCaNFZR9Bp6VGNSTCa5jCES0rPK3SInZNr3+710n84vIYMtN16Q==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.60.5/2c3673198da8170ffb5347bb23b1865f63659b7e}
+
+  '@happyvertical/utils@0.66.0':
+    resolution: {integrity: sha512-J/HUyq1bKEvue/6uI3+061l+dn27XNssZwXsiE/broSBr3Kcifs2TyKOo5bJ+07XqlufI1P0TUfDhMqvB0YdRw==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.66.0/f9df19445dad820266e8235f2d023d7ab2fe5e3a}
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -766,6 +766,10 @@ packages:
 
   '@paralleldrive/cuid2@3.0.4':
     resolution: {integrity: sha512-sM6M2PWrByOEpN2QYAdulhEbSZmChwj0e52u4hpwB7u4PznFiNAavtE6m7O8tWUlzX+jT2eKKtc5/ZgX+IHrtg==}
+    hasBin: true
+
+  '@paralleldrive/cuid2@3.0.6':
+    resolution: {integrity: sha512-ujtxTTvr4fwPrzuQT7o6VLKs5BzdWetR9+/zRQ0SyK9hVIwZQllEccxgcHYXN6I3Z429y1yg3F6+uiVxMDPrLQ==}
     hasBin: true
 
   '@pkgjs/parseargs@0.11.0':
@@ -3411,16 +3415,16 @@ snapshots:
       - ws
       - zod
 
-  '@happyvertical/utils@0.60.2':
+  '@happyvertical/utils@0.60.5':
     dependencies:
       '@paralleldrive/cuid2': 3.0.4
       date-fns: 4.1.0
       pluralize: 8.0.0
       uuid: 13.0.0
 
-  '@happyvertical/utils@0.60.5':
+  '@happyvertical/utils@0.66.0':
     dependencies:
-      '@paralleldrive/cuid2': 3.0.4
+      '@paralleldrive/cuid2': 3.0.6
       date-fns: 4.1.0
       pluralize: 8.0.0
       uuid: 13.0.0
@@ -3591,6 +3595,12 @@ snapshots:
       fastq: 1.19.1
 
   '@paralleldrive/cuid2@3.0.4':
+    dependencies:
+      '@noble/hashes': 2.0.1
+      bignumber.js: 9.3.1
+      error-causes: 3.0.2
+
+  '@paralleldrive/cuid2@3.0.6':
     dependencies:
       '@noble/hashes': 2.0.1
       bignumber.js: 9.3.1
