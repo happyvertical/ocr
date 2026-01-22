@@ -12,8 +12,8 @@ importers:
         specifier: ^1.4.8
         version: 1.4.8
       '@happyvertical/ai':
-        specifier: ^0.66.0
-        version: 0.66.11(ws@8.18.3)
+        specifier: ^0.67.0
+        version: 0.67.1(ws@8.18.3)
       '@happyvertical/utils':
         specifier: ^0.66.0
         version: 0.66.11
@@ -573,11 +573,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@google/genai@1.36.0':
-    resolution: {integrity: sha512-f4S31aVi5G6U1phMKTaNqpik+sfsU1Z25QW3sGyCjtzNj1/0SnCEfWU0Gyq0iR4pjCsaqeeZtSfzHYW3OcEWUQ==}
+  '@google/genai@1.37.0':
+    resolution: {integrity: sha512-of85LwNqretPhBHHEljUY05OSsQVUPyw5n1RdNkUpKR36kgHq7CVVEGY4GplVbFaqbdT3DXfLSv5B/Avbe5vXw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.24.0
+      '@modelcontextprotocol/sdk': ^1.25.2
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
@@ -591,11 +591,16 @@ packages:
   '@gutenye/ocr-node@1.4.8':
     resolution: {integrity: sha512-Ej6hHQSrBLCY74Qb2rRYZ0v97kp3h1Q8obLdQDM208ft9BOyqj+aUN2yTYQ/1c/BO695OWDgufRSiWiLB92KLw==}
 
-  '@happyvertical/ai@0.66.11':
-    resolution: {integrity: sha512-Vgv8WgjpnWtzQhlHIC/jAsq/EfAyoLyjqNK8w9+i6oSilT+umMqfULeUjYIvir/vaIYhnUqsaDAt86KLexh9Pw==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.66.11/7fa0762395444b709bb3f809a9f1638601af203f}
+  '@happyvertical/ai@0.67.1':
+    resolution: {integrity: sha512-UpsbiF2bmjt1ukFVsIl//n00Ead6O9Y+RQSqU5GikB6TUahpup1zjgq1LcbBMeVEQcCZsQCaRWO55QYsK58u7A==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.67.1/fd85107e18d34528a0af0b4510db38a28b7f2f2b}
+    hasBin: true
 
   '@happyvertical/utils@0.66.11':
     resolution: {integrity: sha512-ARSofRmpVs68NpSGGmk6eHXXBmCqQP2LzTyhb/HHoZpO+7iny+WGuvknce2cGK1XAvWnmdjwwwjOX3xXDIEz3w==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.66.11/7f6cbb1352f8bd85d372fea3f46454739f91f001}
+
+  '@happyvertical/utils@0.67.1':
+    resolution: {integrity: sha512-YeXZC+SOdnR8NsCSMK2FwwARyCcpS1AAYn8Sib4uwJ3+gZwsLyebUs3gkZ8/OjSKJrEPUT16TaWBhSiYkPabGg==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.67.1/4cb8fd805fbe9b6a42837ecb97189c9a367b2e01}
+    hasBin: true
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -3405,7 +3410,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.1':
     optional: true
 
-  '@google/genai@1.36.0':
+  '@google/genai@1.37.0':
     dependencies:
       google-auth-library: 10.5.0
       protobufjs: 7.5.4
@@ -3430,12 +3435,12 @@ snapshots:
       onnxruntime-node: 1.23.2
       sharp: 0.33.5
 
-  '@happyvertical/ai@0.66.11(ws@8.18.3)':
+  '@happyvertical/ai@0.67.1(ws@8.18.3)':
     dependencies:
       '@anthropic-ai/sdk': 0.71.2
       '@aws-sdk/client-bedrock-runtime': 3.969.0
-      '@google/genai': 1.36.0
-      '@happyvertical/utils': 0.66.11
+      '@google/genai': 1.37.0
+      '@happyvertical/utils': 0.67.1
       openai: 6.16.0(ws@8.18.3)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
@@ -3447,6 +3452,13 @@ snapshots:
       - zod
 
   '@happyvertical/utils@0.66.11':
+    dependencies:
+      '@paralleldrive/cuid2': 3.0.6
+      date-fns: 4.1.0
+      pluralize: 8.0.0
+      uuid: 13.0.0
+
+  '@happyvertical/utils@0.67.1':
     dependencies:
       '@paralleldrive/cuid2': 3.0.6
       date-fns: 4.1.0
