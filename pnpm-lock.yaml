@@ -15,8 +15,8 @@ importers:
         specifier: ^0.68.0
         version: 0.68.1(ws@8.18.3)
       '@happyvertical/utils':
-        specifier: ^0.67.0
-        version: 0.67.1
+        specifier: ^0.68.0
+        version: 0.68.1
       jpeg-js:
         specifier: 0.4.4
         version: 0.4.4
@@ -615,10 +615,6 @@ packages:
     resolution: {integrity: sha512-SYfs/EVI8GFQU1RIyJHN5/hRs849FybOoQgX33Q623wYV7Vr8vcD0VQvgXmN1g8DkalspFMvEAUgaWg533ffVA==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.68.1/caedb3321f9f2a05a842a52135374bc2c896c8c6}
     hasBin: true
 
-  '@happyvertical/utils@0.67.1':
-    resolution: {integrity: sha512-YeXZC+SOdnR8NsCSMK2FwwARyCcpS1AAYn8Sib4uwJ3+gZwsLyebUs3gkZ8/OjSKJrEPUT16TaWBhSiYkPabGg==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.67.1/4cb8fd805fbe9b6a42837ecb97189c9a367b2e01}
-    hasBin: true
-
   '@happyvertical/utils@0.68.1':
     resolution: {integrity: sha512-OYV0d1TzvA1ttFnYdIJH1R0zxMjwkyarO0KE3Qr8WajQqKtSu3IRjRsIB7etNeOwEzplqed3Y87561Lr5jhWnQ==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.68.1/81ea92f3959cd8d37aeeb6b311e02c1ca5b6aeac}
     hasBin: true
@@ -798,10 +794,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@paralleldrive/cuid2@3.0.6':
-    resolution: {integrity: sha512-ujtxTTvr4fwPrzuQT7o6VLKs5BzdWetR9+/zRQ0SyK9hVIwZQllEccxgcHYXN6I3Z429y1yg3F6+uiVxMDPrLQ==}
-    hasBin: true
 
   '@paralleldrive/cuid2@3.3.0':
     resolution: {integrity: sha512-OqiFvSOF0dBSesELYY2CAMa4YINvlLpvKOz/rv6NeZEqiyttlHgv98Juwv4Ch+GrEV7IZ8jfI2VcEoYUjXXCjw==}
@@ -3576,13 +3568,6 @@ snapshots:
       - ws
       - zod
 
-  '@happyvertical/utils@0.67.1':
-    dependencies:
-      '@paralleldrive/cuid2': 3.0.6
-      date-fns: 4.1.0
-      pluralize: 8.0.0
-      uuid: 13.0.0
-
   '@happyvertical/utils@0.68.1':
     dependencies:
       '@paralleldrive/cuid2': 3.3.0
@@ -3754,12 +3739,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
-
-  '@paralleldrive/cuid2@3.0.6':
-    dependencies:
-      '@noble/hashes': 2.0.1
-      bignumber.js: 9.3.1
-      error-causes: 3.0.2
 
   '@paralleldrive/cuid2@3.3.0':
     dependencies:
