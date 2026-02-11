@@ -1,5 +1,30 @@
 # @happyvertical/ocr
 
+## 0.60.7
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - treat dependency updates as patch bumps in auto-changeset
+
+  ### Dependencies
+
+  - update all dependencies (#38)
+  - update @types/node to v24.10.11 (#37)
+  - update @happyvertical/utils to ^0.68.0 (#36)
+  - update @happyvertical/ai to ^0.68.0 (#35)
+  - update all dependencies (#34)
+  - update all dependencies (#33)
+  - update @biomejs/biome to v2.3.12 (#32)
+  - update @happyvertical/utils to ^0.67.0 (#31)
+  - update @happyvertical/ai to ^0.67.0 (#30)
+  - update pnpm to v10.28.1 (#29)
+  - update @happyvertical/utils to ^0.66.0 (#26)
+  - update @happyvertical/ai to ^0.66.0 (#25)
+  - update all dependencies (#28)
+  - update pnpm to v10.26.2 (#24)
+
 ## 0.60.6
 
 ### Patch Changes
