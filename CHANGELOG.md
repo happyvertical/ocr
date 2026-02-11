@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.8
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - handle multi-line commit bodies in auto-changeset (#40) (ci)
+
 ## 0.60.7
 
 ### Patch Changes
