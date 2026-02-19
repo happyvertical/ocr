@@ -12,8 +12,8 @@ importers:
         specifier: ^1.4.8
         version: 1.4.8
       '@happyvertical/ai':
-        specifier: ^0.68.0
-        version: 0.68.1(ws@8.18.3)
+        specifier: ^0.69.0
+        version: 0.69.0(ws@8.18.3)
       '@happyvertical/utils':
         specifier: ^0.68.0
         version: 0.68.1
@@ -611,12 +611,16 @@ packages:
   '@gutenye/ocr-node@1.4.8':
     resolution: {integrity: sha512-Ej6hHQSrBLCY74Qb2rRYZ0v97kp3h1Q8obLdQDM208ft9BOyqj+aUN2yTYQ/1c/BO695OWDgufRSiWiLB92KLw==}
 
-  '@happyvertical/ai@0.68.1':
-    resolution: {integrity: sha512-SYfs/EVI8GFQU1RIyJHN5/hRs849FybOoQgX33Q623wYV7Vr8vcD0VQvgXmN1g8DkalspFMvEAUgaWg533ffVA==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.68.1/caedb3321f9f2a05a842a52135374bc2c896c8c6}
+  '@happyvertical/ai@0.69.0':
+    resolution: {integrity: sha512-RdKYBz2+kBtfzg5MlR1kiONW3gZb2zy2gDsvyg/ZTKAYdZoZpIMV5pGzj9H07jU+ufpCdq4SLWy0EobKeN8b2w==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.69.0/779f5c37812160ff7d34dc101cecbe11ed57ddcc}
     hasBin: true
 
   '@happyvertical/utils@0.68.1':
     resolution: {integrity: sha512-OYV0d1TzvA1ttFnYdIJH1R0zxMjwkyarO0KE3Qr8WajQqKtSu3IRjRsIB7etNeOwEzplqed3Y87561Lr5jhWnQ==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.68.1/81ea92f3959cd8d37aeeb6b311e02c1ca5b6aeac}
+    hasBin: true
+
+  '@happyvertical/utils@0.69.0':
+    resolution: {integrity: sha512-IWPXg686xAx4CkHXnkFimuVPv/64i3ONwSfykFIa1MobRqjOSeMzGndKL1rQnI1/pcQQf2OXC3xGoKD3tnvg9g==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.69.0/e38d11b5ed62e07a931744da5d16aad634f445e6}
     hasBin: true
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -1073,10 +1077,6 @@ packages:
     resolution: {integrity: sha512-aFP1ai4lrbVlWjfpAfRSL8KFcnJQYfTl5QxLJXY32vghJrDuFyPZ6LtUL+JEGYiFRG1PfPLHLoxj107ulncLIg==}
     engines: {node: '>=18.0.0'}
 
-  '@smithy/node-http-handler@4.4.8':
-    resolution: {integrity: sha512-q9u+MSbJVIJ1QmJ4+1u+cERXkrhuILCBDsJUBAW1MPE6sFonbCNaegFuwW9ll8kh5UdyY3jOkoOGlc7BesoLpg==}
-    engines: {node: '>=18.0.0'}
-
   '@smithy/node-http-handler@4.4.9':
     resolution: {integrity: sha512-KX5Wml5mF+luxm1szW4QDz32e3NObgJ4Fyw+irhph4I/2geXwUy4jkIMUs5ZPGflRBeR6BUkC2wqIab4Llgm3w==}
     engines: {node: '>=18.0.0'}
@@ -1167,10 +1167,6 @@ packages:
 
   '@smithy/util-retry@4.2.8':
     resolution: {integrity: sha512-CfJqwvoRY0kTGe5AkQokpURNCT1u/MkRzMTASWMPPo2hNSnKtF1D45dQl3DE2LKLr4m+PW9mCeBMJr5mCAVThg==}
-    engines: {node: '>=18.0.0'}
-
-  '@smithy/util-stream@4.5.10':
-    resolution: {integrity: sha512-jbqemy51UFSZSp2y0ZmRfckmrzuKww95zT9BYMmuJ8v3altGcqjwoV1tzpOwuHaKrwQrCjIzOib499ymr2f98g==}
     engines: {node: '>=18.0.0'}
 
   '@smithy/util-stream@4.5.11':
@@ -2716,7 +2712,7 @@ snapshots:
       '@smithy/middleware-serde': 4.2.9
       '@smithy/middleware-stack': 4.2.8
       '@smithy/node-config-provider': 4.3.8
-      '@smithy/node-http-handler': 4.4.8
+      '@smithy/node-http-handler': 4.4.9
       '@smithy/protocol-http': 5.3.8
       '@smithy/smithy-client': 4.11.2
       '@smithy/types': 4.12.0
@@ -2729,7 +2725,7 @@ snapshots:
       '@smithy/util-endpoints': 3.2.8
       '@smithy/util-middleware': 4.2.8
       '@smithy/util-retry': 4.2.8
-      '@smithy/util-stream': 4.5.10
+      '@smithy/util-stream': 4.5.11
       '@smithy/util-utf8': 4.2.0
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -2760,7 +2756,7 @@ snapshots:
       '@smithy/middleware-serde': 4.2.9
       '@smithy/middleware-stack': 4.2.8
       '@smithy/node-config-provider': 4.3.8
-      '@smithy/node-http-handler': 4.4.8
+      '@smithy/node-http-handler': 4.4.9
       '@smithy/protocol-http': 5.3.8
       '@smithy/smithy-client': 4.11.2
       '@smithy/types': 4.12.0
@@ -2807,12 +2803,12 @@ snapshots:
       '@aws-sdk/core': 3.973.6
       '@aws-sdk/types': 3.973.1
       '@smithy/fetch-http-handler': 5.3.9
-      '@smithy/node-http-handler': 4.4.8
+      '@smithy/node-http-handler': 4.4.9
       '@smithy/property-provider': 4.2.8
       '@smithy/protocol-http': 5.3.8
       '@smithy/smithy-client': 4.11.2
       '@smithy/types': 4.12.0
-      '@smithy/util-stream': 4.5.10
+      '@smithy/util-stream': 4.5.11
       tslib: 2.8.1
 
   '@aws-sdk/credential-provider-ini@3.972.4':
@@ -2981,7 +2977,7 @@ snapshots:
       '@smithy/middleware-serde': 4.2.9
       '@smithy/middleware-stack': 4.2.8
       '@smithy/node-config-provider': 4.3.8
-      '@smithy/node-http-handler': 4.4.8
+      '@smithy/node-http-handler': 4.4.9
       '@smithy/protocol-http': 5.3.8
       '@smithy/smithy-client': 4.11.2
       '@smithy/types': 4.12.0
@@ -3024,7 +3020,7 @@ snapshots:
       '@smithy/middleware-serde': 4.2.9
       '@smithy/middleware-stack': 4.2.8
       '@smithy/node-config-provider': 4.3.8
-      '@smithy/node-http-handler': 4.4.8
+      '@smithy/node-http-handler': 4.4.9
       '@smithy/protocol-http': 5.3.8
       '@smithy/smithy-client': 4.11.2
       '@smithy/types': 4.12.0
@@ -3552,12 +3548,12 @@ snapshots:
       onnxruntime-node: 1.23.2
       sharp: 0.33.5
 
-  '@happyvertical/ai@0.68.1(ws@8.18.3)':
+  '@happyvertical/ai@0.69.0(ws@8.18.3)':
     dependencies:
       '@anthropic-ai/sdk': 0.71.2
       '@aws-sdk/client-bedrock-runtime': 3.978.0
       '@google/genai': 1.38.0
-      '@happyvertical/utils': 0.68.1
+      '@happyvertical/utils': 0.69.0
       openai: 6.16.0(ws@8.18.3)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
@@ -3569,6 +3565,13 @@ snapshots:
       - zod
 
   '@happyvertical/utils@0.68.1':
+    dependencies:
+      '@paralleldrive/cuid2': 3.3.0
+      date-fns: 4.1.0
+      pluralize: 8.0.0
+      uuid: 13.0.0
+
+  '@happyvertical/utils@0.69.0':
     dependencies:
       '@paralleldrive/cuid2': 3.3.0
       date-fns: 4.1.0
@@ -4025,14 +4028,6 @@ snapshots:
       '@smithy/types': 4.12.0
       tslib: 2.8.1
 
-  '@smithy/node-http-handler@4.4.8':
-    dependencies:
-      '@smithy/abort-controller': 4.2.8
-      '@smithy/protocol-http': 5.3.8
-      '@smithy/querystring-builder': 4.2.8
-      '@smithy/types': 4.12.0
-      tslib: 2.8.1
-
   '@smithy/node-http-handler@4.4.9':
     dependencies:
       '@smithy/abort-controller': 4.2.8
@@ -4166,17 +4161,6 @@ snapshots:
     dependencies:
       '@smithy/service-error-classification': 4.2.8
       '@smithy/types': 4.12.0
-      tslib: 2.8.1
-
-  '@smithy/util-stream@4.5.10':
-    dependencies:
-      '@smithy/fetch-http-handler': 5.3.9
-      '@smithy/node-http-handler': 4.4.8
-      '@smithy/types': 4.12.0
-      '@smithy/util-base64': 4.3.0
-      '@smithy/util-buffer-from': 4.2.0
-      '@smithy/util-hex-encoding': 4.2.0
-      '@smithy/util-utf8': 4.2.0
       tslib: 2.8.1
 
   '@smithy/util-stream@4.5.11':
