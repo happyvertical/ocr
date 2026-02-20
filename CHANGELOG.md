@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.11
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @happyvertical/ai to ^0.69.0 (#43)
+
 ## 0.60.10
 
 ### Patch Changes
