@@ -15,8 +15,8 @@ importers:
         specifier: ^0.71.0
         version: 0.71.1(ws@8.18.3)
       '@happyvertical/utils':
-        specifier: ^0.70.0
-        version: 0.70.1
+        specifier: ^0.71.0
+        version: 0.71.1
       jpeg-js:
         specifier: 0.4.4
         version: 0.4.4
@@ -597,10 +597,6 @@ packages:
 
   '@happyvertical/ai@0.71.1':
     resolution: {integrity: sha512-DHGkhTLelc2i2CIL8fwYrrVTvMwKgd7T5565kfD/NV3knZTylVW7QPC+v3Qn9iCOmJly7Zrm7QHI+4pyIJuPrg==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.71.1/81481cdbd03dec1a9a1b9be0d60b09b6e75ed43c}
-    hasBin: true
-
-  '@happyvertical/utils@0.70.1':
-    resolution: {integrity: sha512-IYmTB7j+Sr828xZDtmEVyG+FowrNHRI3BQy1bd2+wOs7Sm8r0wNpjPzstmfvzOEqYDNUoVbv99apg3f7V77JZg==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.70.1/4082b234ff2e0d84c797f031062c3604703b2dea}
     hasBin: true
 
   '@happyvertical/utils@0.71.1':
@@ -3462,13 +3458,6 @@ snapshots:
       - utf-8-validate
       - ws
       - zod
-
-  '@happyvertical/utils@0.70.1':
-    dependencies:
-      '@paralleldrive/cuid2': 3.3.0
-      date-fns: 4.1.0
-      pluralize: 8.0.0
-      uuid: 13.0.0
 
   '@happyvertical/utils@0.71.1':
     dependencies:
