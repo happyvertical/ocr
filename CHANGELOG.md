@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.21
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @biomejs/biome to v2.4.5 (#53)
+
 ## 0.60.20
 
 ### Patch Changes
