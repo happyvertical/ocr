@@ -18,11 +18,11 @@
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.5",
+    "@biomejs/biome": "2.4.6",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@types/node": "24.11.0",
+    "@types/node": "24.12.0",
     "@types/pngjs": "6.0.5",
     "lefthook": "^1.11.13",
     "tsx": "^4.20.0",
