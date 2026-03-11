@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.24
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update pnpm to v10.32.0 (#56)
+
 ## 0.60.23
 
 ### Patch Changes
