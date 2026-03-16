@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.27
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/create-github-app-token action to v3 (#60)
+
 ## 0.60.26
 
 ### Patch Changes
