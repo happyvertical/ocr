@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.28
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update pnpm/action-setup action to v5 (#61)
+
 ## 0.60.27
 
 ### Patch Changes
