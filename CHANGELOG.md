@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.30
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update all dependencies (#64)
+
 ## 0.60.29
 
 ### Patch Changes
