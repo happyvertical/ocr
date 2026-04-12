@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.35
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/github-script action to v9 (#69)
+
 ## 0.60.34
 
 ### Patch Changes
