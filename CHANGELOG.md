@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.37
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/create-github-app-token digest to 1b10c78 (#71)
+
 ## 0.60.36
 
 ### Patch Changes
