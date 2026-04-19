@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.39
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update pnpm/action-setup digest to 71c9247 (#73)
+
 ## 0.60.38
 
 ### Patch Changes
