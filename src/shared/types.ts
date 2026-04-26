@@ -73,6 +73,14 @@ export interface OCRImage {
   height?: number;
   /** Number of color channels */
   channels?: number;
+  /**
+   * Bits per channel sample. Common values: 1, 8, 16.
+   * Required for unambiguous decoding of raw pixel buffers, where
+   * `bytes.length === width * height * channels * (bitsPerComponent / 8)`.
+   * Without this, a 1-channel × 16-bit buffer is indistinguishable from
+   * a 2-channel × 8-bit buffer of the same pixel count.
+   */
+  bitsPerComponent?: number;
   /** Image format/type */
   format?: string;
   /** Optional metadata for tracking */
