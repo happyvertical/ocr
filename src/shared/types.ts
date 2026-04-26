@@ -75,10 +75,15 @@ export interface OCRImage {
   channels?: number;
   /**
    * Bits per channel sample. Common values: 1, 8, 16.
-   * Required for unambiguous decoding of raw pixel buffers, where
-   * `bytes.length === width * height * channels * (bitsPerComponent / 8)`.
-   * Without this, a 1-channel × 16-bit buffer is indistinguishable from
-   * a 2-channel × 8-bit buffer of the same pixel count.
+   *
+   * Required for unambiguous decoding of raw pixel buffers. Without it, a
+   * 1-channel × 16-bit buffer is indistinguishable from a 2-channel × 8-bit
+   * buffer of the same byte length.
+   *
+   * Expected buffer size depends on whether samples are byte-aligned:
+   * - Byte-aligned (8, 16, 24, …): `bytes.length === width * height * channels * (bitsPerComponent / 8)`
+   * - Bit-packed (1, 2, 4): `bytes.length === Math.ceil(width * height * channels * bitsPerComponent / 8)`
+   *   (PDF `/BitsPerComponent` 1/2/4 streams are typically packed this way.)
    */
   bitsPerComponent?: number;
   /** Image format/type */
