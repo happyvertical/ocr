@@ -12,8 +12,8 @@ importers:
         specifier: ^1.4.8
         version: 1.4.8
       '@happyvertical/ai':
-        specifier: ^0.72.0
-        version: 0.72.0(ws@8.18.3)
+        specifier: ^0.73.0
+        version: 0.73.0(ws@8.18.3)
       '@happyvertical/utils':
         specifier: ^0.72.0
         version: 0.72.0
@@ -607,12 +607,16 @@ packages:
   '@gutenye/ocr-node@1.4.8':
     resolution: {integrity: sha512-Ej6hHQSrBLCY74Qb2rRYZ0v97kp3h1Q8obLdQDM208ft9BOyqj+aUN2yTYQ/1c/BO695OWDgufRSiWiLB92KLw==}
 
-  '@happyvertical/ai@0.72.0':
-    resolution: {integrity: sha512-9m8FoE16P88vZRFjAheVpFWTqeAWAKkU43jnQgXiMGVb5WT+9ikVpwHFaNSJvqhjmlfLASqXwQ2eBhoOWOXTnQ==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.72.0/0ee0dde47f45da0b50599260b0e863252b0ae353}
+  '@happyvertical/ai@0.73.0':
+    resolution: {integrity: sha512-f6vu0J21oVc1ESaD7B/m4zaD5g3THTXdPtbGP3YWm7xp0luoYmQwRkYcNlnyYZK02h3V00+eEvQQXa7cZmgwhA==, tarball: https://npm.pkg.github.com/download/@happyvertical/ai/0.73.0/c88bae4959b7d37b8ff07c84acab6fff0558b9c0}
     hasBin: true
 
   '@happyvertical/utils@0.72.0':
     resolution: {integrity: sha512-3hX91dmZzuiRmBpCj/9XsATEbQE0s8zUaPpcGcE0GGl3i4NFiPklx5ZS2nW6SzYXEsBMajUniDYSO4IlLIw4fg==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.72.0/02bf9d8046b97b3dd35d2fd4ae24b24741c0b1c7}
+    hasBin: true
+
+  '@happyvertical/utils@0.73.0':
+    resolution: {integrity: sha512-0ABPkezStL6djsge8xxgDgshxVu5un/I9TMYdXb5LKuninRq1gAEmUdxQjs6OdMCZ/oNKGIx/Lq3U/I8BehRXg==, tarball: https://npm.pkg.github.com/download/@happyvertical/utils/0.73.0/56d254746c0e4bb604e15297e63bbd2ce780f5f3}
     hasBin: true
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -3497,12 +3501,12 @@ snapshots:
       onnxruntime-node: 1.23.2
       sharp: 0.33.5
 
-  '@happyvertical/ai@0.72.0(ws@8.18.3)':
+  '@happyvertical/ai@0.73.0(ws@8.18.3)':
     dependencies:
       '@anthropic-ai/sdk': 0.90.0
       '@aws-sdk/client-bedrock-runtime': 3.1034.0
       '@google/genai': 1.50.1
-      '@happyvertical/utils': 0.72.0
+      '@happyvertical/utils': 0.73.0
       openai: 6.34.0(ws@8.18.3)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
@@ -3514,6 +3518,13 @@ snapshots:
       - zod
 
   '@happyvertical/utils@0.72.0':
+    dependencies:
+      '@paralleldrive/cuid2': 3.3.0
+      date-fns: 4.1.0
+      pluralize: 8.0.0
+      uuid: 13.0.0
+
+  '@happyvertical/utils@0.73.0':
     dependencies:
       '@paralleldrive/cuid2': 3.3.0
       date-fns: 4.1.0
