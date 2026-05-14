@@ -1,5 +1,25 @@
 # @happyvertical/ocr
 
+## 0.60.40
+
+### Patch Changes
+
+- ### Features
+
+  - add bitsPerComponent to OCRImage (#76) (ocr)
+
+  ### Dependencies
+
+  - update all dependencies (#87)
+  - update all dependencies (#86)
+  - update all dependencies (#83)
+  - update all dependencies (#82)
+  - update @happyvertical/utils to ^0.73.0 (#81)
+  - update @happyvertical/ai to ^0.73.0 (#80)
+  - update @happyvertical/utils to ^0.72.0 (#79)
+  - update @happyvertical/ai to ^0.72.0 (#78)
+  - update all dependencies (#74)
+
 ## 0.60.39
 
 ### Patch Changes
