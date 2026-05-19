@@ -1,6 +1,6 @@
 {
   "name": "@happyvertical/ocr",
-  "version": "0.60.40",
+  "version": "0.60.41",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
