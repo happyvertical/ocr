@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.44
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update vite to v7.3.5 (#91)
+
 ## 0.60.43
 
 ### Patch Changes
