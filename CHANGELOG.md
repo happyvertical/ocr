@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.46
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @types/node to v24.13.1 (#93)
+
 ## 0.60.45
 
 ### Patch Changes
