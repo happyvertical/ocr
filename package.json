@@ -4,7 +4,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@10.34.3",
   "engines": {
     "node": ">=24",
     "pnpm": ">=9"
@@ -18,11 +18,11 @@
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.0",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@types/node": "24.13.1",
+    "@types/node": "24.13.2",
     "@types/pngjs": "6.0.5",
     "lefthook": "^1.11.13",
     "tsx": "^4.20.0",
