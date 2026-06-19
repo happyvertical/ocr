@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.49
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/checkout action to v7 (#96)
+
 ## 0.60.48
 
 ### Patch Changes
