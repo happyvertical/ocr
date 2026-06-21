@@ -1,0 +1,25 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "name": "@happyvertical/ocr",
+  "readme": "none",
+  "gitRevision": "main",
+  "cleanOutputDir": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "treatWarningsAsErrors": true,
+  "treatValidationWarningsAsErrors": true,
+  "requiredToBeDocumented": ["Class", "Interface", "Function", "TypeAlias"],
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": true,
+    "notExported": true,
+    "rewrittenLink": true
+  },
+  "hideGenerator": true,
+  "sourceLinkExternal": true,
+  "sort": ["source-order"]
+}

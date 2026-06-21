@@ -358,7 +358,7 @@ const factory = new OCRFactory({
 });
 
 // Manually register provider
-await factory.registerProvider(new MyOCRProvider());
+factory.addProvider('my-provider', new MyOCRProvider());
 
 // Use custom provider
 const result = await factory.performOCR(images);
@@ -377,19 +377,35 @@ When implementing a custom provider:
 7. **Return bounding boxes**: Include precise text positioning when available
 8. **Map language codes**: Support common language code formats
 
-## API Reference
+## Development
 
-For complete API documentation, see the generated TypeDoc documentation:
+Common local quality checks:
 
 ```bash
-# Generate documentation
-npm run docs
-
-# View in browser
-npm run dev  # Opens http://localhost:3030
+pnpm lint
+pnpm typecheck
+pnpm build
+pnpm docs:api
+pnpm docs:api:check
+pnpm test:coverage
+pnpm pack --dry-run
 ```
 
-Documentation is available in both HTML and Markdown formats in the `docs/` directory.
+Coverage uses Vitest V8 coverage and gates statements, branches, functions, and
+lines at `80/65/80/80`.
+
+## API Reference
+
+Generated API reference documentation lives in `docs/api/` and is built from
+public JSDoc comments with TypeDoc.
+
+```bash
+pnpm docs:api
+pnpm docs:api:check
+```
+
+`docs:api:check` regenerates the API reference and fails if `docs/api/` is not
+up to date.
 
 ## License
 

@@ -806,45 +806,36 @@ const providers = await ocrFactory.getProvidersInfo();
 console.log('Available providers:', providers.map(p => p.name));
 ```
 
-## API Documentation
+## API Documentation And Quality Gates
 
-The @happyvertical/ocr package generates comprehensive API documentation in both HTML and markdown formats using TypeDoc:
+The @happyvertical/ocr package generates committed API reference documentation
+with TypeDoc from the public entry point (`src/index.ts`). Generated files live
+under `docs/api/`; do not edit them by hand.
 
-### Generated Documentation Formats
-
-**HTML Documentation** (recommended for browsing):
-- Generated in `docs/` directory for public website
-- Full API reference with interactive navigation
-- Cross-linked type definitions and examples
-- Accessible via development server at `http://localhost:3030/`
-
-**Markdown Documentation** (great for development):
-- Generated in `packages/ocr/docs/` directory
-- Markdown format perfect for IDE integration
-- Accessible via development server at `http://localhost:3030/packages/ocr/`
-
-### Generating Documentation
+### Generated API Documentation
 
 ```bash
-# Generate documentation for this package
-npm run docs
-
-# Generate and watch for changes during development
-npm run docs:watch
-
-# Start development server to browse documentation
-npm run dev  # Serves docs at http://localhost:3030
+pnpm docs:api        # Regenerate docs/api/
+pnpm docs:api:check  # Regenerate and fail if docs/api/ changes
 ```
 
-### Development Workflow
+TypeDoc uses `gitRevision: "main"` so source links remain deterministic across
+commits. Public classes, interfaces, functions, and type aliases should have
+useful JSDoc before generating docs.
 
-Documentation is automatically generated during the build process and can be viewed alongside development:
+### Coverage Gate
 
-1. **During Development**: Use `npm run docs:watch` to regenerate docs as you code
-2. **Local Browsing**: Access HTML docs at `http://localhost:3030/` or markdown at `http://localhost:3030/packages/ocr/`
-3. **IDE Integration**: Point your editor to `packages/ocr/docs/` for offline markdown reference
+```bash
+pnpm test:coverage
+```
 
-The documentation includes complete API coverage, usage examples, and cross-references to related HAVE SDK packages.
+Coverage uses Vitest V8 coverage with all source files included and global
+thresholds of `80/65/80/80` for statements, branches, functions, and lines.
+Prefer focused unit tests with mocked providers when raising coverage around
+provider edge paths; keep the real OCR integration tests reserved for fixture
+validation.
+
+CI runs build, typecheck, lint, `docs:api:check`, and `test:coverage`.
 
 ## Debugging and Troubleshooting
 

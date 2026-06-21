@@ -488,6 +488,17 @@ export class LiteLLMProvider implements OCRProvider {
     return null;
   }
 
+  /**
+   * Extract visible text from one or more images using the configured vision model.
+   *
+   * Images are sent as OpenAI-compatible multimodal message parts. Simple mode
+   * returns plain text, while structured mode attempts to parse confidence
+   * estimates from a JSON response.
+   *
+   * @param images - Images to process.
+   * @param options - OCR options such as language hints.
+   * @returns Text, confidence, detections, and provider metadata.
+   */
   async performOCR(
     images: OCRImage[],
     options?: OCROptions,
@@ -684,6 +695,11 @@ export class LiteLLMProvider implements OCRProvider {
     }
   }
 
+  /**
+   * Check whether authentication and the underlying AI client can be initialized.
+   *
+   * @returns Dependency status with auth mode, model, and endpoint details.
+   */
   async checkDependencies(): Promise<DependencyCheckResult> {
     // Check authentication configuration based on auth type
     if (this.authType === 'oauth2') {
@@ -749,6 +765,11 @@ export class LiteLLMProvider implements OCRProvider {
     }
   }
 
+  /**
+   * Describe the LiteLLM provider's OCR capabilities.
+   *
+   * @returns Supported formats, language coverage, and provider-specific details.
+   */
   async checkCapabilities(): Promise<OCRCapabilities> {
     return {
       canPerformOCR: true,
@@ -766,6 +787,11 @@ export class LiteLLMProvider implements OCRProvider {
     };
   }
 
+  /**
+   * Get language codes that vision LLMs are expected to handle.
+   *
+   * @returns Common OCR language codes accepted as language hints.
+   */
   getSupportedLanguages(): string[] {
     // Vision LLMs generally support most written languages
     return [
@@ -803,6 +829,9 @@ export class LiteLLMProvider implements OCRProvider {
     ];
   }
 
+  /**
+   * Clear cached AI clients and OAuth2 tokens.
+   */
   async cleanup(): Promise<void> {
     this.aiClient = null;
     this.cachedToken = null;

@@ -198,7 +198,10 @@ export interface OCRFactoryOptions {
 }
 
 /**
- * Error classes for OCR operations
+ * Base error for OCR dependency, processing, and unsupported-operation failures.
+ *
+ * Carries the provider name and optional context so callers can report or
+ * recover from provider-specific failures without string parsing.
  */
 export class OCRError extends Error {
   constructor(
@@ -211,6 +214,9 @@ export class OCRError extends Error {
   }
 }
 
+/**
+ * Error thrown when an OCR provider cannot load or verify its dependencies.
+ */
 export class OCRDependencyError extends OCRError {
   constructor(provider: string, message: string, context?: any) {
     super(
@@ -222,6 +228,9 @@ export class OCRDependencyError extends OCRError {
   }
 }
 
+/**
+ * Error thrown when a provider does not support a requested OCR operation.
+ */
 export class OCRUnsupportedError extends OCRError {
   constructor(provider: string, operation: string, context?: any) {
     super(
@@ -233,6 +242,9 @@ export class OCRUnsupportedError extends OCRError {
   }
 }
 
+/**
+ * Error thrown when an OCR provider fails while processing image data.
+ */
 export class OCRProcessingError extends OCRError {
   constructor(provider: string, message: string, context?: any) {
     super(
