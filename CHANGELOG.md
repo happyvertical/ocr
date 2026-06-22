@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.60.51
+
+### Patch Changes
+
+- 0308f77: Gate generated API docs and coverage for public package quality.
+
 ## 0.60.50
 
 ### Patch Changes
