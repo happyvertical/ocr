@@ -2,8 +2,31 @@
  * @happyvertical/ocr - Environment variable configuration tests
  */
 
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { getOCR, OCRFactory, resetOCRFactory } from './factory';
+import type { OCRProvider } from './types';
+
+const createMockProvider = (
+  overrides: Partial<OCRProvider> = {},
+): OCRProvider => ({
+  name: 'mock',
+  performOCR: vi.fn().mockResolvedValue({
+    text: 'mock text',
+    confidence: 90,
+    detections: [],
+  }),
+  checkDependencies: vi.fn().mockResolvedValue({
+    available: true,
+    details: {},
+  }),
+  checkCapabilities: vi.fn().mockResolvedValue({
+    canPerformOCR: true,
+    supportedLanguages: ['eng'],
+  }),
+  getSupportedLanguages: vi.fn().mockReturnValue(['eng']),
+  cleanup: vi.fn().mockResolvedValue(undefined),
+  ...overrides,
+});
 
 describe('OCRFactory environment variable configuration', () => {
   // Store original env vars
@@ -249,5 +272,139 @@ describe('OCRFactory environment variable configuration', () => {
       const defaultOptions = (factory as any).defaultOptions;
       expect(defaultOptions?.language).toBe(lang);
     }
+  });
+
+  test('should use fallback providers when the primary result is empty', async () => {
+    const primary = createMockProvider({
+      name: 'primary',
+      performOCR: vi.fn().mockResolvedValue({
+        text: '',
+        confidence: 0,
+        detections: [],
+      }),
+    });
+    const fallback = createMockProvider({
+      name: 'fallback',
+      performOCR: vi.fn().mockResolvedValue({
+        text: 'fallback text',
+        confidence: 75,
+        detections: [],
+      }),
+    });
+    const factory = new OCRFactory({
+      provider: 'primary',
+      fallbackProviders: ['fallback'],
+      defaultOptions: { language: 'eng' },
+    });
+    (factory as any).initialized = true;
+    factory.addProvider('primary', primary);
+    factory.addProvider('fallback', fallback);
+
+    const result = await factory.performOCR([{ data: Buffer.alloc(128) }]);
+
+    expect(result.text).toBe('fallback text');
+    expect(result.metadata?.provider).toBe('fallback');
+    expect(result.metadata?.fallbackFrom).toBe('primary');
+    expect(primary.performOCR).toHaveBeenCalledTimes(1);
+    expect(fallback.performOCR).toHaveBeenCalledTimes(1);
+  });
+
+  test('should ignore unavailable or failing fallback providers', async () => {
+    const primary = createMockProvider({
+      name: 'primary',
+      performOCR: vi.fn().mockResolvedValue({
+        text: '',
+        confidence: 0,
+        detections: [],
+      }),
+    });
+    const unavailableFallback = createMockProvider({
+      name: 'unavailable',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        details: {},
+      }),
+    });
+    const failingFallback = createMockProvider({
+      name: 'failing',
+      checkDependencies: vi.fn().mockRejectedValue(new Error('boom')),
+    });
+    const factory = new OCRFactory({
+      provider: 'primary',
+      fallbackProviders: ['primary', 'missing', 'unavailable', 'failing'],
+    });
+    (factory as any).initialized = true;
+    factory.addProvider('primary', primary);
+    factory.addProvider('unavailable', unavailableFallback);
+    factory.addProvider('failing', failingFallback);
+
+    const result = await factory.performOCR([{ data: Buffer.alloc(128) }]);
+
+    expect(result.text).toBe('');
+    expect(unavailableFallback.performOCR).not.toHaveBeenCalled();
+    expect(failingFallback.performOCR).not.toHaveBeenCalled();
+  });
+
+  test('should report provider info failures without throwing', async () => {
+    const provider = createMockProvider({
+      name: 'broken-info',
+      checkCapabilities: vi.fn().mockRejectedValue(new Error('bad caps')),
+    });
+    const factory = new OCRFactory({ provider: 'broken-info' });
+    (factory as any).initialized = true;
+    factory.addProvider('broken-info', provider);
+
+    const info = await factory.getProvidersInfo();
+
+    expect(info).toEqual([
+      {
+        name: 'broken-info',
+        available: false,
+        dependencies: {
+          available: false,
+          error: 'bad caps',
+          details: {},
+        },
+        capabilities: null,
+      },
+    ]);
+  });
+
+  test('should throw when no provider is available for non-empty OCR', async () => {
+    const factory = new OCRFactory({ provider: 'missing' });
+    (factory as any).initialized = true;
+
+    await expect(
+      factory.performOCR([{ data: Buffer.alloc(128) }]),
+    ).rejects.toThrow('No OCR providers are available');
+  });
+
+  test('should return no languages when no provider is available', async () => {
+    const factory = new OCRFactory({ provider: 'missing' });
+    (factory as any).initialized = true;
+
+    await expect(factory.getSupportedLanguages()).resolves.toEqual([]);
+    await expect(factory.isOCRAvailable()).resolves.toBe(false);
+  });
+
+  test('should remove providers and run cleanup', async () => {
+    const cleanup = vi.fn().mockResolvedValue(undefined);
+    const provider = createMockProvider({ name: 'custom', cleanup });
+    const factory = new OCRFactory();
+    (factory as any).initialized = true;
+    factory.addProvider('custom', provider);
+
+    await factory.removeProvider('custom');
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(factory.getAvailableProviderNames()).toEqual([]);
+  });
+
+  test('resetOCRFactory should ignore async cleanup failures', () => {
+    const factory = getOCR();
+    factory.cleanup = vi.fn().mockRejectedValue(new Error('cleanup failed'));
+
+    expect(() => resetOCRFactory()).not.toThrow();
+    expect(getOCR()).not.toBe(factory);
   });
 });

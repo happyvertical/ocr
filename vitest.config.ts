@@ -13,5 +13,17 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/*.d.ts'],
+      reporter: ['text', 'html', 'json-summary'],
+      thresholds: {
+        statements: 80,
+        branches: 65,
+        functions: 80,
+        lines: 80,
+      },
+    },
   },
 });

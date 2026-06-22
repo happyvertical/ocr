@@ -1,13 +1,13 @@
-# @happyvertical/ocr: Standardized OCR Interface Package
+# @happyvertical/ocr: Node-First OCR Interface Package
 
 ## Purpose and Responsibilities
 
 The `@happyvertical/ocr` package provides a unified interface for Optical Character Recognition (OCR) operations with multi-provider support. It serves as the OCR abstraction layer for the HAVE SDK and handles:
 
-- **Multi-Provider OCR**: Unified API for Tesseract.js and ONNX-based OCR engines (PaddleOCR PP-OCRv4)
+- **Multi-Provider OCR**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), and HappyVertical AI-backed vision OCR
 - **Intelligent Fallback**: Automatic provider selection and fallback when primary providers fail
-- **Cross-Platform Support**: Works in both Node.js and browser environments with appropriate providers
-- **Environment Detection**: Automatically selects compatible OCR providers based on runtime environment
+- **Node-First Support**: Optimized for Node.js packages and server-side OCR workflows
+- **Environment Detection**: Selects compatible OCR providers based on runtime environment
 - **Performance Optimization**: Lazy loading of OCR dependencies and efficient provider management
 - **Language Support**: Multi-language OCR with 60+ languages (Tesseract) and 7 core languages (ONNX)
 
@@ -21,7 +21,7 @@ This package abstracts away the complexities of different OCR engines, allowing 
    - `OCRFactory` class: Main factory for managing providers with singleton support
    - `getOCR()` function: Convenience function returning global factory or creating new instances
    - Provider initialization with lazy loading and parallel dependency checks
-   - Automatic environment detection (Node.js, browser, unknown)
+   - Automatic environment detection (Node.js, browser, unknown), with Node.js as the supported public runtime
    - Global factory instance with `resetOCRFactory()` for testing
 
 2. **Type System (`shared/types.ts`)**
@@ -31,9 +31,10 @@ This package abstracts away the complexities of different OCR engines, allowing 
    - Error classes: `OCRError`, `OCRDependencyError`, `OCRProcessingError`, `OCRUnsupportedError`
 
 3. **Provider Implementations**
-   - `TesseractProvider` (Node.js): Cross-platform OCR using Tesseract.js with worker pooling
+   - `TesseractProvider` (Node.js): OCR using Tesseract.js with worker pooling
    - `ONNXGutenyeProvider` (Node.js only): High-accuracy OCR using PaddleOCR PP-OCRv4 models
-   - `WebOCRProvider` (Browser only): Browser-optimized Tesseract.js with WebAssembly
+   - `LiteLLMProvider` (Node.js): Vision-model OCR through `@happyvertical/ai`
+   - `WebOCRProvider` (legacy/experimental): Browser-oriented Tesseract.js provider retained in source but not the public package focus
 
 ### Provider Architecture Patterns
 
@@ -44,8 +45,8 @@ This package abstracts away the complexities of different OCR engines, allowing 
 - Workers/instances cached per language to avoid reinitialization costs
 
 **Priority Order (Auto-selection):**
-- Node.js: `['onnx', 'tesseract']` - ONNX preferred for accuracy
-- Browser: `['tesseract', 'web-ocr']` - Both use Tesseract.js
+- Node.js: `['onnx', 'tesseract', 'litellm']` - ONNX preferred for local accuracy, LiteLLM last because it is network-backed
+- Browser: `['tesseract', 'web-ocr']` - legacy path, not the primary public runtime
 - Unknown: `['tesseract']` - Fallback to most compatible
 
 **Factory Singleton Pattern:**
@@ -98,8 +99,7 @@ const available = await ocrFactory.isOCRAvailable();
 // Perform OCR on images
 const result = await ocrFactory.performOCR(images, {
   language: 'eng',
-  confidenceThreshold: 60,
-  outputFormat: 'text'
+  confidenceThreshold: 60
 });
 
 console.log('Extracted text:', result.text);
@@ -145,10 +145,7 @@ const result = await ocrFactory.performOCR(images);
 // Advanced OCR with options
 const advancedResult = await ocrFactory.performOCR(images, {
   language: 'eng+chi_sim',     // Multi-language support
-  confidenceThreshold: 80,     // Filter low-confidence results
-  improveResolution: true,     // Enhance image quality (provider-dependent)
-  outputFormat: 'json',        // Get structured output with bounding boxes
-  timeout: 30000              // Processing timeout
+  confidenceThreshold: 80      // Provider-dependent confidence filtering
 });
 
 // Process results with bounding boxes and confidence scores
@@ -185,8 +182,7 @@ import {
 // Check available providers in current environment
 const providers = await getAvailableProviders();
 console.log('Available OCR providers:', providers);
-// Node.js: ['onnx', 'tesseract']
-// Browser: ['tesseract', 'web-ocr']
+// Node.js: ['onnx', 'tesseract', 'litellm'] depending on installed/configured dependencies
 
 // Check specific provider availability
 const onnxAvailable = await isProviderAvailable('onnx');
@@ -249,34 +245,22 @@ for (const provider of providers) {
 const ocrFactory = getOCR();
 const environment = ocrFactory.getEnvironment();
 
-if (environment === 'node') {
-  // Node.js environment - multiple providers available
-  console.log('Running in Node.js - checking for available OCR providers');
-  const tesseractAvailable = await isProviderAvailable('tesseract');
-  const onnxAvailable = await isProviderAvailable('onnx');
+if (environment !== 'node') {
+  throw new Error('@happyvertical/ocr is intended for Node.js runtimes');
+}
 
-  if (onnxAvailable) {
-    // Use ONNX (PaddleOCR) OCR - higher accuracy
-    const result = await ocrFactory.performOCR(images, {
-      language: 'eng',
-      confidenceThreshold: 90
-    });
-  } else if (tesseractAvailable) {
-    // Fallback to Tesseract.js OCR
-    const result = await ocrFactory.performOCR(images, {
-      language: 'eng',
-      confidenceThreshold: 80
-    });
-  }
-} else if (environment === 'browser') {
-  // Browser environment - Web OCR available
-  console.log('Running in browser - using WebAssembly OCR');
-  
-  // Tesseract.js works in browsers
+const tesseractAvailable = await isProviderAvailable('tesseract');
+const onnxAvailable = await isProviderAvailable('onnx');
+
+if (onnxAvailable) {
   const result = await ocrFactory.performOCR(images, {
     language: 'eng',
-    confidenceThreshold: 70,
-    outputFormat: 'text'
+    confidenceThreshold: 90
+  });
+} else if (tesseractAvailable) {
+  const result = await ocrFactory.performOCR(images, {
+    language: 'eng',
+    confidenceThreshold: 80
   });
 }
 ```
@@ -293,18 +277,6 @@ const customFactory = new OCRFactory({
   defaultOptions: {
     language: 'eng',
     confidenceThreshold: 85,      // Higher threshold for ONNX
-    improveResolution: false,     // ONNX handles optimization internally
-    outputFormat: 'json',         // Get structured output with bounding boxes
-    timeout: 45000               // Extended timeout for ONNX initialization
-  },
-  providerConfig: {
-    // Provider-specific configurations can be added here
-    onnx: {
-      // ONNX-specific settings would go here
-    },
-    tesseract: {
-      // Tesseract-specific settings would go here
-    }
   }
 });
 
@@ -588,19 +560,18 @@ try {
    - Terminate during cleanup to free memory
    - Handle initialization failures gracefully
 
-3. **Browser vs Node.js**: Different capabilities per environment
-   - Use `globalThis` for environment detection, not `window` or `process`
-   - Browser: Limited to WebAssembly-compatible formats
-   - Node.js: Can use native image processing libraries
+3. **Runtime Detection**: Node.js is the supported public runtime
+   - Use `globalThis` for shared environment detection
+   - Node.js can use native image processing libraries and dependency-provided OCR models
+   - Browser-oriented code is retained as a legacy path, not the primary package target
 
 4. **Empty Result Handling**: Don't fail on empty text extraction
    - Return `{ text: '', confidence: 0, detections: [] }` for empty results
    - Factory handles fallback to alternative providers if configured
 
-5. **Timeout Handling**: Different environments need different timeouts
-   - Node.js: 30s default (ONNX initialization can take time)
-   - Browser: 15s default (user experience considerations)
-   - Make configurable via options
+5. **Timeout Handling**: Timeout options are not uniformly enforced by all providers yet
+   - ONNX initialization can take time
+   - Treat timeout behavior as provider-specific until normalized
 
 ### File Structure Conventions
 
@@ -612,9 +583,10 @@ src/
 │   └── types.ts            # Interfaces, types, error classes
 ├── node/
 │   ├── tesseract.ts        # Tesseract.js provider (Node.js)
-│   └── onnx-gutenye.ts     # ONNX provider using @gutenye/ocr-node
+│   ├── onnx-gutenye.ts     # ONNX provider using @gutenye/ocr-node
+│   └── litellm.ts          # Vision OCR via @happyvertical/ai
 └── browser/
-    └── web-ocr.ts          # Browser-optimized Tesseract.js
+    └── web-ocr.ts          # Legacy browser-oriented Tesseract.js provider
 ```
 
 ### Testing OCR Providers
@@ -643,21 +615,22 @@ expect(result.text.length).toBeGreaterThan(0);
 - **Lazy Loading**: OCR engines are loaded only when first used to reduce startup time
 - **Worker Management**: Tesseract.js workers are cached per language and reused across operations
 - **Memory Management**: Large images are automatically processed with memory-efficient techniques
-- **Timeout Handling**: All OCR operations have configurable timeouts (default 30s, browser 15s)
+- **Timeout Handling**: Timeout configuration exists in the public options, but provider-level enforcement is uneven and should be treated carefully until normalized.
 - **Provider Fallback**: Failed providers automatically fall back to alternatives in priority order
 - **Image Format Optimization**:
   - ONNX provider automatically converts PNG/JPEG to optimized RGB format
   - Tesseract.js handles most formats natively with WebAssembly
   - Automatic image signature detection prevents processing of invalid data
 - **Confidence Filtering**: Low-confidence results can be filtered to improve output quality
-- **Progressive Processing**: Browser environments show progress updates for long OCR operations
+- **LLM Provider**: Any LLM-backed OCR should use `@happyvertical/ai`; do not add direct model SDK clients in this package.
 
-### Cross-Platform Development
+### Runtime Development
 
-- **Environment Detection**: Use `globalThis` instead of `window` or `process` for compatibility
+- **Node First**: Keep the main package entrypoint and docs optimized for Node.js consumers.
+- **Environment Detection**: Use `globalThis` instead of direct `window` checks where shared code needs runtime detection.
 - **Conditional Imports**: Load platform-specific providers dynamically
 - **Error Handling**: Provide graceful degradation when providers are unavailable
-- **Testing**: Test in both Node.js and browser environments
+- **Testing**: Node.js behavior is the release-critical path.
 
 ## Installation and Setup
 
@@ -676,7 +649,7 @@ The @happyvertical/ocr package supports configuration via environment variables 
 
 **Supported Environment Variables:**
 
-- `HAVE_OCR_PROVIDER` - OCR provider to use (`'auto'`, `'tesseract'`, `'onnx'`, `'web-ocr'`)
+- `HAVE_OCR_PROVIDER` - OCR provider to use (`'auto'`, `'tesseract'`, `'onnx'`, `'litellm'`; `web-ocr` is legacy/experimental)
 - `HAVE_OCR_LANGUAGE` - Default language for OCR (`'eng'`, `'eng+chi_sim'`, etc.)
 - `HAVE_OCR_CONFIDENCE_THRESHOLD` - Minimum confidence threshold (0-100)
 - `HAVE_OCR_TIMEOUT` - Processing timeout in milliseconds
@@ -806,45 +779,36 @@ const providers = await ocrFactory.getProvidersInfo();
 console.log('Available providers:', providers.map(p => p.name));
 ```
 
-## API Documentation
+## API Documentation And Quality Gates
 
-The @happyvertical/ocr package generates comprehensive API documentation in both HTML and markdown formats using TypeDoc:
+The @happyvertical/ocr package generates committed API reference documentation
+with TypeDoc from the public entry point (`src/index.ts`). Generated files live
+under `docs/api/`; do not edit them by hand.
 
-### Generated Documentation Formats
-
-**HTML Documentation** (recommended for browsing):
-- Generated in `docs/` directory for public website
-- Full API reference with interactive navigation
-- Cross-linked type definitions and examples
-- Accessible via development server at `http://localhost:3030/`
-
-**Markdown Documentation** (great for development):
-- Generated in `packages/ocr/docs/` directory
-- Markdown format perfect for IDE integration
-- Accessible via development server at `http://localhost:3030/packages/ocr/`
-
-### Generating Documentation
+### Generated API Documentation
 
 ```bash
-# Generate documentation for this package
-npm run docs
-
-# Generate and watch for changes during development
-npm run docs:watch
-
-# Start development server to browse documentation
-npm run dev  # Serves docs at http://localhost:3030
+pnpm docs:api        # Regenerate docs/api/
+pnpm docs:api:check  # Regenerate and fail if docs/api/ changes
 ```
 
-### Development Workflow
+TypeDoc uses `gitRevision: "main"` so source links remain deterministic across
+commits. Public classes, interfaces, functions, and type aliases should have
+useful JSDoc before generating docs.
 
-Documentation is automatically generated during the build process and can be viewed alongside development:
+### Coverage Gate
 
-1. **During Development**: Use `npm run docs:watch` to regenerate docs as you code
-2. **Local Browsing**: Access HTML docs at `http://localhost:3030/` or markdown at `http://localhost:3030/packages/ocr/`
-3. **IDE Integration**: Point your editor to `packages/ocr/docs/` for offline markdown reference
+```bash
+pnpm test:coverage
+```
 
-The documentation includes complete API coverage, usage examples, and cross-references to related HAVE SDK packages.
+Coverage uses Vitest V8 coverage with all source files included and global
+thresholds of `80/65/80/80` for statements, branches, functions, and lines.
+Prefer focused unit tests with mocked providers when raising coverage around
+provider edge paths; keep the real OCR integration tests reserved for fixture
+validation.
+
+CI runs build, typecheck, lint, `docs:api:check`, and `test:coverage`.
 
 ## Debugging and Troubleshooting
 
@@ -881,8 +845,7 @@ const result = await factory.performOCR([
   { data: buffer, format: 'png' }
 ], {
   language: 'eng',
-  confidenceThreshold: 0, // Remove filtering
-  outputFormat: 'json'    // Get detailed detections
+  confidenceThreshold: 0 // Remove filtering
 });
 
 console.log('Detections:', result.detections);
@@ -905,8 +868,7 @@ if (!available) {
 
 // Test with simple image
 const testResult = await onnxFactory.performOCR([testImage], {
-  language: 'eng',
-  timeout: 60000 // Increase timeout for initialization
+  language: 'eng'
 });
 ```
 
@@ -928,7 +890,7 @@ afterEach(() => {
 });
 ```
 
-**Issue: Browser compatibility errors**
+**Issue: Legacy browser compatibility errors**
 ```typescript
 // Check browser environment
 const factory = getOCR();
@@ -945,7 +907,7 @@ if (env === 'browser') {
     console.error('Browser does not support Web Workers');
   }
 
-  // Use web-ocr provider explicitly
+  // Use web-ocr explicitly only for legacy browser-specific behavior
   const webFactory = getOCR({ provider: 'web-ocr' });
 }
 ```
@@ -1048,7 +1010,8 @@ When working with @happyvertical/ocr:
    - **Use auto-selection** for most cases (intelligent defaults)
    - **Force ONNX** when accuracy is critical and Node.js environment confirmed
    - **Use Tesseract** when multi-language support (>7 languages) is needed
-   - **Use web-ocr** explicitly only for browser-specific features
+   - **Use LiteLLM** when a configured HappyVertical AI-backed vision model should perform OCR
+   - **Use web-ocr** only for legacy browser-specific behavior
 
 2. **Error Handling Strategy**
    - **Always wrap in try-catch**: OCR operations can fail for many reasons
@@ -1093,8 +1056,7 @@ const factory = getOCR({
   fallbackProviders: ['tesseract'],
   defaultOptions: {
     language: 'eng',
-    confidenceThreshold: 70,
-    timeout: 30000
+    confidenceThreshold: 70
   }
 });
 
@@ -1105,9 +1067,7 @@ try {
   }
 
   // Process images
-  const result = await factory.performOCR(images, {
-    outputFormat: 'json' // Get detections with bounding boxes
-  });
+  const result = await factory.performOCR(images);
 
   // Log diagnostics
   console.log('OCR completed:', {
@@ -1238,7 +1198,7 @@ const processScannedPDF = async (pdfBuffer: Buffer) => {
 
 **Strengths:**
 - Wide language support (60+ languages with automatic model download)
-- Cross-platform compatibility (Node.js and browser)
+- Node.js compatibility without system OCR dependencies
 - Good accuracy on machine-printed text
 - Word-level confidence scores and bounding boxes
 - Zero system dependencies
@@ -1251,7 +1211,6 @@ const processScannedPDF = async (pdfBuffer: Buffer) => {
 
 **Optimal Use Cases:**
 - Multi-language document processing
-- Browser-based OCR applications
 - Systems without ONNX Runtime support
 - Processing of clean, machine-printed text
 
@@ -1278,7 +1237,7 @@ const processScannedPDF = async (pdfBuffer: Buffer) => {
 - Mixed printed/handwritten text
 - Documents in core supported languages (English, Chinese, Japanese, Korean, French, German)
 
-### Web OCR Provider
+### Web OCR Provider (Legacy/Experimental)
 
 **Strengths:**
 - Browser-optimized with progress tracking
@@ -1293,7 +1252,7 @@ const processScannedPDF = async (pdfBuffer: Buffer) => {
 - Limited to Tesseract.js capabilities
 
 **Optimal Use Cases:**
-- Client-side document processing
+- Experimental client-side document processing
 - Privacy-sensitive applications
 - Offline-capable web applications
 - Progressive web apps with OCR features
@@ -1310,7 +1269,7 @@ const processScannedPDF = async (pdfBuffer: Buffer) => {
 - BMP (bitmap)
 - TIFF (multi-page support)
 - PBM, PGM, PPM (Netpbm formats)
-- WebP (browser environments)
+- WebP where supported by the underlying Tesseract.js runtime
 - GIF (static images)
 
 **ONNX Provider Processing:**
@@ -1349,7 +1308,7 @@ const images = [
 **Three-Layer Design:**
 1. **Factory Layer** (`shared/factory.ts`): Provider management, auto-selection, fallback
 2. **Type Layer** (`shared/types.ts`): Interfaces, errors, data structures
-3. **Provider Layer** (`node/`, `browser/`): Platform-specific OCR implementations
+3. **Provider Layer** (`node/`, `browser/`): Node.js providers plus legacy browser-oriented implementation
 
 **Key Design Decisions:**
 - **Lazy loading**: Providers loaded only when first used
@@ -1420,16 +1379,16 @@ providersInfo.forEach(p => {
 
 ### Provider Comparison Matrix
 
-| Feature | ONNX | Tesseract | Web OCR |
-|---------|------|-----------|---------|
-| **Environment** | Node.js only | Node.js + Browser | Browser only |
-| **Accuracy** | Highest (90%+) | Good (70-85%) | Good (70-85%) |
-| **Speed** | Fast (after init) | Moderate | Moderate |
-| **Languages** | 7 core | 100+ | 100+ |
-| **Setup** | Auto (included) | Auto (npm) | Auto (browser) |
-| **Bounding Boxes** | Yes (precise) | Yes (word-level) | Yes (word-level) |
-| **Memory** | Higher | Moderate | Lower (browser constraints) |
-| **Best For** | High-accuracy production | Multi-language, compatibility | Client-side, privacy |
+| Feature | ONNX | Tesseract | LiteLLM | Web OCR |
+|---------|------|-----------|---------|---------|
+| **Environment** | Node.js only | Node.js | Node.js | Legacy browser path |
+| **Accuracy** | Highest local OCR | Good | Model-dependent | Good |
+| **Speed** | Fast after init | Moderate | Network-dependent | Moderate |
+| **Languages** | 7 core | 100+ | Model-dependent | 100+ |
+| **Setup** | Auto through dependency | Auto through dependency | `@happyvertical/ai` config | Browser model loading |
+| **Bounding Boxes** | Yes, precise | Yes, word-level | No | Yes, word-level |
+| **Memory** | Higher | Moderate | Low local memory | Browser constrained |
+| **Best For** | High-accuracy production | Multi-language compatibility | Vision-model OCR workflows | Experimental client-side OCR |
 
 ### When to Use Which Provider
 
@@ -1441,8 +1400,7 @@ providersInfo.forEach(p => {
 
 **Use Tesseract when:**
 - Need 100+ language support
-- Cross-platform compatibility required
-- Browser support needed
+- Broad language support is required
 - ONNX dependencies unavailable
 
 **Use Auto-selection when:**

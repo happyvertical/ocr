@@ -1,9 +1,8 @@
 /**
- * @happyvertical/ocr - Tesseract.js provider for cross-platform OCR processing
+ * @happyvertical/ocr - Tesseract.js provider for Node.js OCR processing
  *
  * This module implements the OCRProvider interface using Tesseract.js,
- * providing reliable OCR capabilities that work in both Node.js and
- * browser environments with zero system dependencies.
+ * providing reliable OCR capabilities in Node.js with zero system dependencies.
  */
 
 import type {
@@ -17,17 +16,16 @@ import type {
 import { OCRDependencyError, OCRProcessingError } from '../shared/types';
 
 /**
- * Tesseract.js OCR provider implementation for cross-platform text extraction.
+ * Tesseract.js OCR provider implementation for Node.js text extraction.
  *
  * This provider leverages Tesseract.js to provide reliable OCR capabilities
  * without requiring system-level dependencies. It's the most compatible
- * provider in the @happyvertical/ocr package, working in virtually any JavaScript
- * environment.
+ * provider in the @happyvertical/ocr package for Node.js environments.
  *
  * ## Key Features
  *
  * - **Zero Dependencies**: Pure JavaScript implementation using WebAssembly
- * - **Cross-Platform**: Works in Node.js, browsers, and other JavaScript environments
+ * - **Node.js Runtime**: Works without system OCR dependencies
  * - **Multi-Language**: Supports 100+ languages with automatic model downloading
  * - **Confidence Scores**: Provides word-level and overall confidence metrics
  * - **Bounding Boxes**: Returns precise text positioning information
@@ -499,8 +497,7 @@ export class TesseractProvider implements OCRProvider {
       providerSpecific: {
         webAssembly: true,
         modelDownloads: true, // Tesseract.js downloads models on first use
-        crossPlatform: true,
-        browserSupported: true,
+        nodeRuntime: true,
       },
     };
   }

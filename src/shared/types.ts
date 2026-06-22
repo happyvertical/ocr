@@ -62,10 +62,9 @@ export interface OCROptions {
  * - Raw image files (PNG, JPEG, etc.) as Buffer
  * - RGB pixel data with dimensions
  * - Base64 encoded image strings
- * - File paths (as strings)
  */
 export interface OCRImage {
-  /** Image data as Buffer, Uint8Array, or string (base64/path) */
+  /** Image data as Buffer, Uint8Array, or base64 string */
   data: Buffer | Uint8Array | string;
   /** Image width in pixels */
   width?: number;
@@ -200,18 +199,26 @@ export interface OCRProvider {
  * OCR factory configuration options
  */
 export interface OCRFactoryOptions {
-  /** Primary provider to use ('auto', 'tesseract', 'onnx') */
+  /** Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm') */
   provider?: string;
   /** Fallback providers to try if primary fails */
   fallbackProviders?: string[];
   /** Default options for OCR operations */
   defaultOptions?: OCROptions;
-  /** Provider-specific configuration */
+  /**
+   * Reserved for provider-specific configuration.
+   *
+   * Built-in providers currently use constructor options or environment
+   * variables for provider-specific configuration.
+   */
   providerConfig?: Record<string, any>;
 }
 
 /**
- * Error classes for OCR operations
+ * Base error for OCR dependency, processing, and unsupported-operation failures.
+ *
+ * Carries the provider name and optional context so callers can report or
+ * recover from provider-specific failures without string parsing.
  */
 export class OCRError extends Error {
   constructor(
@@ -224,6 +231,9 @@ export class OCRError extends Error {
   }
 }
 
+/**
+ * Error thrown when an OCR provider cannot load or verify its dependencies.
+ */
 export class OCRDependencyError extends OCRError {
   constructor(provider: string, message: string, context?: any) {
     super(
@@ -235,6 +245,9 @@ export class OCRDependencyError extends OCRError {
   }
 }
 
+/**
+ * Error thrown when a provider does not support a requested OCR operation.
+ */
 export class OCRUnsupportedError extends OCRError {
   constructor(provider: string, operation: string, context?: any) {
     super(
@@ -246,6 +259,9 @@ export class OCRUnsupportedError extends OCRError {
   }
 }
 
+/**
+ * Error thrown when an OCR provider fails while processing image data.
+ */
 export class OCRProcessingError extends OCRError {
   constructor(provider: string, message: string, context?: any) {
     super(

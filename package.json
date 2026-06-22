@@ -24,8 +24,11 @@
     "@commitlint/config-conventional": "^19.8.1",
     "@types/node": "24.13.2",
     "@types/pngjs": "6.0.5",
+    "@vitest/coverage-v8": "^4.0.15",
     "lefthook": "^1.11.13",
     "tsx": "^4.20.0",
+    "typedoc": "^0.28.19",
+    "typedoc-plugin-markdown": "^4.12.0",
     "typescript": "^5.9.3",
     "vite": "7.3.5",
     "vite-plugin-dts": "4.5.4",
@@ -37,7 +40,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "description": "Standardized OCR interface with support for multiple providers including Tesseract.js and ONNX (PaddleOCR)",
+  "description": "Node-first OCR interface with support for Tesseract.js, ONNX (PaddleOCR), and HappyVertical AI-backed vision OCR",
   "keywords": [
     "ocr",
     "optical-character-recognition",
@@ -51,7 +54,6 @@
     "text-recognition",
     "multi-provider",
     "typescript",
-    "browser",
     "nodejs"
   ],
   "repository": {
@@ -60,6 +62,7 @@
   },
   "files": [
     "dist",
+    "docs/api",
     "README.md",
     "LICENSE"
   ],
@@ -74,12 +77,15 @@
   "license": "MIT",
   "scripts": {
     "test": "vitest run --testTimeout 120000",
+    "test:coverage": "vitest run --coverage --testTimeout 120000",
     "test:watch": "vitest --testTimeout 120000",
     "build": "vite build",
     "build:watch": "vite build --watch",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src/",
     "format": "biome format --write src/",
+    "docs:api": "typedoc --options typedoc.json",
+    "docs:api:check": "sh -c 'before=$(git status --porcelain -- docs/api); pnpm docs:api; after=$(git status --porcelain -- docs/api); test \"$before\" = \"$after\"'",
     "clean": "rm -rf dist *.tsbuildinfo",
     "dev": "npm run build:watch & npm run test:watch",
     "changeset": "changeset",

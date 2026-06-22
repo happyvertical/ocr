@@ -1,14 +1,14 @@
 /**
- * @happyvertical/ocr - Standardized OCR interface with multi-provider support
+ * @happyvertical/ocr - Node-first OCR interface with multi-provider support
  *
  * This package provides a unified interface for Optical Character Recognition (OCR)
- * operations across multiple providers with intelligent fallback and environment detection.
+ * operations across Node.js providers with intelligent fallback and environment detection.
  *
  * ## Features
  *
- * - **Multi-Provider Support**: Tesseract.js, ONNX Runtime (PaddleOCR), and browser-optimized OCR
+ * - **Multi-Provider Support**: Tesseract.js, ONNX Runtime (PaddleOCR), and HappyVertical AI-backed vision OCR
  * - **Intelligent Fallback**: Automatic provider selection with graceful degradation
- * - **Cross-Platform**: Works in Node.js and browser environments
+ * - **Node-First**: Optimized for server-side packages and workflows
  * - **Rich Output**: Text extraction with confidence scores and bounding boxes
  * - **Multi-Language**: Support for 100+ languages depending on provider
  * - **TypeScript**: Full type safety with comprehensive interfaces
@@ -54,8 +54,7 @@
  *
  * ```typescript
  * const result = await factory.performOCR(images, {
- *   language: 'eng+chi_sim+jpn', // English + Chinese + Japanese
- *   outputFormat: 'json'
+ *   language: 'eng+chi_sim+jpn' // English + Chinese + Japanese
  * });
  *
  * // Access detailed detections with bounding boxes
@@ -80,9 +79,7 @@ export {
 // Export all types
 export * from './shared/types';
 
-// Re-export provider classes for direct instantiation if needed
-// Note: Only export providers available in current environment
-// The factory will handle environment-specific provider selection
+// Re-export the HappyVertical AI-backed provider for direct instantiation.
 
 export type {
   LiteLLMAuthType,
