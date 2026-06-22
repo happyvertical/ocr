@@ -6,7 +6,7 @@
 
 # Interface: ProviderCompatibility
 
-Defined in: [src/shared/types.ts:281](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L281)
+Defined in: [src/shared/types.ts:294](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L294)
 
 Provider compatibility matrix
 
@@ -16,7 +16,7 @@ Provider compatibility matrix
 
 > **environment**: [`OCREnvironment`](../type-aliases/OCREnvironment.md)
 
-Defined in: [src/shared/types.ts:282](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L282)
+Defined in: [src/shared/types.ts:295](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L295)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [src/shared/types.ts:282](https://github.com/happyvertical/ocr/blob/
 
 > **provider**: `string`
 
-Defined in: [src/shared/types.ts:283](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L283)
+Defined in: [src/shared/types.ts:296](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L296)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [src/shared/types.ts:283](https://github.com/happyvertical/ocr/blob/
 
 > **supported**: `boolean`
 
-Defined in: [src/shared/types.ts:284](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L284)
+Defined in: [src/shared/types.ts:297](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L297)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [src/shared/types.ts:284](https://github.com/happyvertical/ocr/blob/
 
 > `optional` **reason?**: `string`
 
-Defined in: [src/shared/types.ts:285](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L285)
+Defined in: [src/shared/types.ts:298](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L298)

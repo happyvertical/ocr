@@ -1,5 +1,105 @@
 # @happyvertical/ocr
 
+## 0.60.50
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update pnpm to v10.34.4 (#97)
+
+## 0.60.49
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/checkout action to v7 (#96)
+
+## 0.60.48
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update pnpm/action-setup digest to 0ebf471 (#95)
+
+## 0.60.47
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update all dependencies (#94)
+
+## 0.60.46
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @types/node to v24.13.1 (#93)
+
+## 0.60.45
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @types/node to v24.13.0 (#92)
+
+## 0.60.44
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update vite to v7.3.5 (#91)
+
+## 0.60.43
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update all dependencies (#90)
+
+## 0.60.42
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @happyvertical/utils to ^0.74.0 (#89)
+
+## 0.60.41
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update @happyvertical/ai to ^0.74.0 (#88)
+
+## 0.60.40
+
+### Patch Changes
+
+- ### Features
+
+  - add bitsPerComponent to OCRImage (#76) (ocr)
+
+  ### Dependencies
+
+  - update all dependencies (#87)
+  - update all dependencies (#86)
+  - update all dependencies (#83)
+  - update all dependencies (#82)
+  - update @happyvertical/utils to ^0.73.0 (#81)
+  - update @happyvertical/ai to ^0.73.0 (#80)
+  - update @happyvertical/utils to ^0.72.0 (#79)
+  - update @happyvertical/ai to ^0.72.0 (#78)
+  - update all dependencies (#74)
+
 ## 0.60.39
 
 ### Patch Changes

@@ -6,7 +6,7 @@
 
 # Interface: OCRProviderInfo
 
-Defined in: [src/shared/types.ts:266](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L266)
+Defined in: [src/shared/types.ts:279](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L279)
 
 Provider information for discovery
 
@@ -16,7 +16,7 @@ Provider information for discovery
 
 > **name**: `string`
 
-Defined in: [src/shared/types.ts:267](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L267)
+Defined in: [src/shared/types.ts:280](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L280)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [src/shared/types.ts:267](https://github.com/happyvertical/ocr/blob/
 
 > **available**: `boolean`
 
-Defined in: [src/shared/types.ts:268](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L268)
+Defined in: [src/shared/types.ts:281](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L281)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [src/shared/types.ts:268](https://github.com/happyvertical/ocr/blob/
 
 > **dependencies**: [`DependencyCheckResult`](DependencyCheckResult.md)
 
-Defined in: [src/shared/types.ts:269](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L269)
+Defined in: [src/shared/types.ts:282](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L282)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [src/shared/types.ts:269](https://github.com/happyvertical/ocr/blob/
 
 > **capabilities**: [`OCRCapabilities`](OCRCapabilities.md) \| `null`
 
-Defined in: [src/shared/types.ts:270](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L270)
+Defined in: [src/shared/types.ts:283](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L283)

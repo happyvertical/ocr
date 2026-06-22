@@ -57,11 +57,30 @@ Number of color channels
 
 ***
 
+### bitsPerComponent?
+
+> `optional` **bitsPerComponent?**: `number`
+
+Defined in: [src/shared/types.ts:87](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L87)
+
+Bits per channel sample. Common values: 1, 8, 16.
+
+Required for unambiguous decoding of raw pixel buffers. Without it, a
+1-channel × 16-bit buffer is indistinguishable from a 2-channel × 8-bit
+buffer of the same byte length.
+
+Expected buffer size depends on whether samples are byte-aligned:
+- Byte-aligned (8, 16, 24, …): `bytes.length === width * height * channels * (bitsPerComponent / 8)`
+- Bit-packed (1, 2, 4): `bytes.length === Math.ceil(width * height * channels * bitsPerComponent / 8)`
+  (PDF `/BitsPerComponent` 1/2/4 streams are typically packed this way.)
+
+***
+
 ### format?
 
 > `optional` **format?**: `string`
 
-Defined in: [src/shared/types.ts:76](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L76)
+Defined in: [src/shared/types.ts:89](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L89)
 
 Image format/type
 
@@ -71,6 +90,6 @@ Image format/type
 
 > `optional` **metadata?**: `Record`\<`string`, `any`\>
 
-Defined in: [src/shared/types.ts:78](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L78)
+Defined in: [src/shared/types.ts:91](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L91)
 
 Optional metadata for tracking
