@@ -6,7 +6,7 @@
 
 # Interface: OCRFactoryOptions
 
-Defined in: [src/shared/types.ts:189](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L189)
+Defined in: [src/shared/types.ts:188](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L188)
 
 OCR factory configuration options
 
@@ -16,9 +16,9 @@ OCR factory configuration options
 
 > `optional` **provider?**: `string`
 
-Defined in: [src/shared/types.ts:191](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L191)
+Defined in: [src/shared/types.ts:190](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L190)
 
-Primary provider to use ('auto', 'tesseract', 'onnx')
+Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm')
 
 ***
 
@@ -26,7 +26,7 @@ Primary provider to use ('auto', 'tesseract', 'onnx')
 
 > `optional` **fallbackProviders?**: `string`[]
 
-Defined in: [src/shared/types.ts:193](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L193)
+Defined in: [src/shared/types.ts:192](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L192)
 
 Fallback providers to try if primary fails
 
@@ -36,7 +36,7 @@ Fallback providers to try if primary fails
 
 > `optional` **defaultOptions?**: [`OCROptions`](OCROptions.md)
 
-Defined in: [src/shared/types.ts:195](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L195)
+Defined in: [src/shared/types.ts:194](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L194)
 
 Default options for OCR operations
 
@@ -46,6 +46,9 @@ Default options for OCR operations
 
 > `optional` **providerConfig?**: `Record`\<`string`, `any`\>
 
-Defined in: [src/shared/types.ts:197](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L197)
+Defined in: [src/shared/types.ts:201](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L201)
 
-Provider-specific configuration
+Reserved for provider-specific configuration.
+
+Built-in providers currently use constructor options or environment
+variables for provider-specific configuration.

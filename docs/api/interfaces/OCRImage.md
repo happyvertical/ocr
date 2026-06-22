@@ -6,7 +6,7 @@
 
 # Interface: OCRImage
 
-Defined in: [src/shared/types.ts:67](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L67)
+Defined in: [src/shared/types.ts:66](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L66)
 
 Represents an image input for OCR processing operations.
 
@@ -14,7 +14,6 @@ Supports multiple input formats to accommodate different use cases:
 - Raw image files (PNG, JPEG, etc.) as Buffer
 - RGB pixel data with dimensions
 - Base64 encoded image strings
-- File paths (as strings)
 
 ## Properties
 
@@ -22,9 +21,9 @@ Supports multiple input formats to accommodate different use cases:
 
 > **data**: `string` \| `Buffer`\<`ArrayBufferLike`\> \| `Uint8Array`\<`ArrayBufferLike`\>
 
-Defined in: [src/shared/types.ts:69](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L69)
+Defined in: [src/shared/types.ts:68](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L68)
 
-Image data as Buffer, Uint8Array, or string (base64/path)
+Image data as Buffer, Uint8Array, or base64 string
 
 ***
 
@@ -32,7 +31,7 @@ Image data as Buffer, Uint8Array, or string (base64/path)
 
 > `optional` **width?**: `number`
 
-Defined in: [src/shared/types.ts:71](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L71)
+Defined in: [src/shared/types.ts:70](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L70)
 
 Image width in pixels
 
@@ -42,7 +41,7 @@ Image width in pixels
 
 > `optional` **height?**: `number`
 
-Defined in: [src/shared/types.ts:73](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L73)
+Defined in: [src/shared/types.ts:72](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L72)
 
 Image height in pixels
 
@@ -52,7 +51,7 @@ Image height in pixels
 
 > `optional` **channels?**: `number`
 
-Defined in: [src/shared/types.ts:75](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L75)
+Defined in: [src/shared/types.ts:74](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L74)
 
 Number of color channels
 
@@ -62,7 +61,7 @@ Number of color channels
 
 > `optional` **format?**: `string`
 
-Defined in: [src/shared/types.ts:77](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L77)
+Defined in: [src/shared/types.ts:76](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L76)
 
 Image format/type
 
@@ -72,6 +71,6 @@ Image format/type
 
 > `optional` **metadata?**: `Record`\<`string`, `any`\>
 
-Defined in: [src/shared/types.ts:79](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L79)
+Defined in: [src/shared/types.ts:78](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L78)
 
 Optional metadata for tracking

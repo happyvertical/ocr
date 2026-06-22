@@ -6,7 +6,7 @@
 
 # Class: OCRError
 
-Defined in: [src/shared/types.ts:206](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L206)
+Defined in: [src/shared/types.ts:210](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L210)
 
 Base error for OCR dependency, processing, and unsupported-operation failures.
 
@@ -29,7 +29,7 @@ recover from provider-specific failures without string parsing.
 
 > **new OCRError**(`message`, `provider?`, `context?`): `OCRError`
 
-Defined in: [src/shared/types.ts:207](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L207)
+Defined in: [src/shared/types.ts:211](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L211)
 
 #### Parameters
 
@@ -59,7 +59,7 @@ Defined in: [src/shared/types.ts:207](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **provider?**: `string`
 
-Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L209)
+Defined in: [src/shared/types.ts:213](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L213)
 
 ***
 
@@ -67,7 +67,7 @@ Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **context?**: `any`
 
-Defined in: [src/shared/types.ts:210](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L210)
+Defined in: [src/shared/types.ts:214](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L214)
 
 ***
 

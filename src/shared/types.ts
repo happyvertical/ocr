@@ -62,10 +62,9 @@ export interface OCROptions {
  * - Raw image files (PNG, JPEG, etc.) as Buffer
  * - RGB pixel data with dimensions
  * - Base64 encoded image strings
- * - File paths (as strings)
  */
 export interface OCRImage {
-  /** Image data as Buffer, Uint8Array, or string (base64/path) */
+  /** Image data as Buffer, Uint8Array, or base64 string */
   data: Buffer | Uint8Array | string;
   /** Image width in pixels */
   width?: number;
@@ -187,13 +186,18 @@ export interface OCRProvider {
  * OCR factory configuration options
  */
 export interface OCRFactoryOptions {
-  /** Primary provider to use ('auto', 'tesseract', 'onnx') */
+  /** Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm') */
   provider?: string;
   /** Fallback providers to try if primary fails */
   fallbackProviders?: string[];
   /** Default options for OCR operations */
   defaultOptions?: OCROptions;
-  /** Provider-specific configuration */
+  /**
+   * Reserved for provider-specific configuration.
+   *
+   * Built-in providers currently use constructor options or environment
+   * variables for provider-specific configuration.
+   */
   providerConfig?: Record<string, any>;
 }
 

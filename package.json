@@ -40,7 +40,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "description": "Standardized OCR interface with support for multiple providers including Tesseract.js and ONNX (PaddleOCR)",
+  "description": "Node-first OCR interface with support for Tesseract.js, ONNX (PaddleOCR), and HappyVertical AI-backed vision OCR",
   "keywords": [
     "ocr",
     "optical-character-recognition",
@@ -54,7 +54,6 @@
     "text-recognition",
     "multi-provider",
     "typescript",
-    "browser",
     "nodejs"
   ],
   "repository": {

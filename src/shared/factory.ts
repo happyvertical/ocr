@@ -85,8 +85,7 @@ function detectEnvironment(): OCREnvironment {
  * ```typescript
  * const factory = new OCRFactory({
  *   defaultOptions: {
- *     language: 'eng+chi_sim+jpn',
- *     outputFormat: 'json'
+ *     language: 'eng+chi_sim+jpn'
  *   }
  * });
  *
@@ -393,9 +392,7 @@ export class OCRFactory {
    * ```typescript
    * const result = await factory.performOCR(images, {
    *   language: 'eng+chi_sim',
-   *   confidenceThreshold: 80,
-   *   outputFormat: 'json',
-   *   timeout: 45000
+   *   confidenceThreshold: 80
    * });
    *
    * // Access detailed detections
@@ -809,11 +806,11 @@ let globalOCRFactory: OCRFactory | null = null;
  * const factory = getOCR();
  * const env = factory.getEnvironment();
  *
- * const options = env === 'browser'
- *   ? { language: 'eng', timeout: 15000 }
- *   : { language: 'eng+chi_sim', timeout: 30000 };
+ * if (env !== 'node') {
+ *   throw new Error('@happyvertical/ocr is intended for Node.js runtimes');
+ * }
  *
- * const result = await factory.performOCR(images, options);
+ * const result = await factory.performOCR(images, { language: 'eng+chi_sim' });
  * ```
  */
 export function getOCR(options?: OCRFactoryOptions): OCRFactory {

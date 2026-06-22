@@ -6,7 +6,7 @@
 
 # Interface: OCRProvider
 
-Defined in: [src/shared/types.ts:156](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L156)
+Defined in: [src/shared/types.ts:155](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L155)
 
 Core interface that all OCR providers must implement.
 
@@ -19,7 +19,7 @@ providing a consistent API for text extraction.
 
 > `readonly` **name**: `string`
 
-Defined in: [src/shared/types.ts:158](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L158)
+Defined in: [src/shared/types.ts:157](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L157)
 
 Provider name identifier
 
@@ -29,7 +29,7 @@ Provider name identifier
 
 > **performOCR**(`images`, `options?`): `Promise`\<[`OCRResult`](OCRResult.md)\>
 
-Defined in: [src/shared/types.ts:163](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L163)
+Defined in: [src/shared/types.ts:162](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L162)
 
 Perform OCR on image data
 
@@ -53,7 +53,7 @@ Perform OCR on image data
 
 > **checkDependencies**(): `Promise`\<[`DependencyCheckResult`](DependencyCheckResult.md)\>
 
-Defined in: [src/shared/types.ts:168](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L168)
+Defined in: [src/shared/types.ts:167](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L167)
 
 Check if provider dependencies are available
 
@@ -67,7 +67,7 @@ Check if provider dependencies are available
 
 > **checkCapabilities**(): `Promise`\<[`OCRCapabilities`](OCRCapabilities.md)\>
 
-Defined in: [src/shared/types.ts:173](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L173)
+Defined in: [src/shared/types.ts:172](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L172)
 
 Get provider capabilities
 
@@ -81,7 +81,7 @@ Get provider capabilities
 
 > **getSupportedLanguages**(): `string`[]
 
-Defined in: [src/shared/types.ts:178](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L178)
+Defined in: [src/shared/types.ts:177](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L177)
 
 Get supported languages
 
@@ -95,7 +95,7 @@ Get supported languages
 
 > `optional` **cleanup**(): `Promise`\<`void`\>
 
-Defined in: [src/shared/types.ts:183](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L183)
+Defined in: [src/shared/types.ts:182](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L182)
 
 Clean up provider resources (optional)
 

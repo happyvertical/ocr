@@ -6,7 +6,7 @@
 
 # Class: OCRDependencyError
 
-Defined in: [src/shared/types.ts:220](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L220)
+Defined in: [src/shared/types.ts:224](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L224)
 
 Error thrown when an OCR provider cannot load or verify its dependencies.
 
@@ -20,7 +20,7 @@ Error thrown when an OCR provider cannot load or verify its dependencies.
 
 > **new OCRDependencyError**(`provider`, `message`, `context?`): `OCRDependencyError`
 
-Defined in: [src/shared/types.ts:221](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L221)
+Defined in: [src/shared/types.ts:225](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L225)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: [src/shared/types.ts:221](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **provider?**: `string`
 
-Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L209)
+Defined in: [src/shared/types.ts:213](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L213)
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **context?**: `any`
 
-Defined in: [src/shared/types.ts:210](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L210)
+Defined in: [src/shared/types.ts:214](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L214)
 
 #### Inherited from
 

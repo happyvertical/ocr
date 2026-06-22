@@ -6,7 +6,7 @@
 
 # Interface: OCRResult
 
-Defined in: [src/shared/types.ts:88](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L88)
+Defined in: [src/shared/types.ts:87](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L87)
 
 Result object returned from OCR processing operations.
 
@@ -19,7 +19,7 @@ detailed detection information including bounding boxes.
 
 > **text**: `string`
 
-Defined in: [src/shared/types.ts:90](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L90)
+Defined in: [src/shared/types.ts:89](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L89)
 
 Extracted text
 
@@ -29,7 +29,7 @@ Extracted text
 
 > **confidence**: `number`
 
-Defined in: [src/shared/types.ts:92](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L92)
+Defined in: [src/shared/types.ts:91](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L91)
 
 Overall confidence score (0-100)
 
@@ -39,7 +39,7 @@ Overall confidence score (0-100)
 
 > `optional` **detections?**: `object`[]
 
-Defined in: [src/shared/types.ts:94](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L94)
+Defined in: [src/shared/types.ts:93](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L93)
 
 Detailed detection results
 
@@ -77,7 +77,7 @@ Detailed detection results
 
 > `optional` **metadata?**: `object`
 
-Defined in: [src/shared/types.ts:105](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L105)
+Defined in: [src/shared/types.ts:104](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L104)
 
 Processing metadata
 

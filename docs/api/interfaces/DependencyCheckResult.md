@@ -6,7 +6,7 @@
 
 # Interface: DependencyCheckResult
 
-Defined in: [src/shared/types.ts:119](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L119)
+Defined in: [src/shared/types.ts:118](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L118)
 
 Dependency check result for OCR providers
 
@@ -16,7 +16,7 @@ Dependency check result for OCR providers
 
 > **available**: `boolean`
 
-Defined in: [src/shared/types.ts:121](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L121)
+Defined in: [src/shared/types.ts:120](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L120)
 
 Whether all dependencies are available
 
@@ -26,7 +26,7 @@ Whether all dependencies are available
 
 > `optional` **error?**: `string`
 
-Defined in: [src/shared/types.ts:123](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L123)
+Defined in: [src/shared/types.ts:122](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L122)
 
 Error message if dependencies are missing
 
@@ -36,7 +36,7 @@ Error message if dependencies are missing
 
 > **details**: `Record`\<`string`, `any`\>
 
-Defined in: [src/shared/types.ts:125](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L125)
+Defined in: [src/shared/types.ts:124](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L124)
 
 Detailed information about specific dependencies
 
@@ -46,6 +46,6 @@ Detailed information about specific dependencies
 
 > `optional` **version?**: `string`
 
-Defined in: [src/shared/types.ts:127](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L127)
+Defined in: [src/shared/types.ts:126](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L126)
 
 Version information if available

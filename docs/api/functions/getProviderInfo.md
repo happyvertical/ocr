@@ -8,7 +8,7 @@
 
 > **getProviderInfo**(`providerName`): `Promise`\<[`OCRProviderInfo`](../interfaces/OCRProviderInfo.md) \| `null`\>
 
-Defined in: [src/shared/factory.ts:957](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L957)
+Defined in: [src/shared/factory.ts:954](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L954)
 
 Get detailed information about a specific OCR provider.
 

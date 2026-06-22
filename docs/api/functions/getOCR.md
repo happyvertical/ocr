@@ -8,7 +8,7 @@
 
 > **getOCR**(`options?`): [`OCRFactory`](../classes/OCRFactory.md)
 
-Defined in: [src/shared/factory.ts:819](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L819)
+Defined in: [src/shared/factory.ts:816](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L816)
 
 Get or create an OCR factory instance with automatic provider selection.
 
@@ -77,9 +77,9 @@ const factory = getOCR(); // Uses env vars for defaults
 const factory = getOCR();
 const env = factory.getEnvironment();
 
-const options = env === 'browser'
-  ? { language: 'eng', timeout: 15000 }
-  : { language: 'eng+chi_sim', timeout: 30000 };
+if (env !== 'node') {
+  throw new Error('@happyvertical/ocr is intended for Node.js runtimes');
+}
 
-const result = await factory.performOCR(images, options);
+const result = await factory.performOCR(images, { language: 'eng+chi_sim' });
 ```

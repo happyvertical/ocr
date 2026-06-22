@@ -9,18 +9,18 @@ sidebar_position: 7
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Standardized OCR interface with multi-provider support for Node.js and browser environments. Part of the HAVE SDK ecosystem.
+Node-first OCR interface with multi-provider support for server-side text extraction. Part of the HAVE SDK ecosystem.
 
 ## Overview
 
-The `@happyvertical/ocr` package provides a unified interface for Optical Character Recognition (OCR) operations with intelligent provider selection and automatic fallback. It abstracts away the complexities of different OCR engines, allowing consistent text extraction regardless of the underlying OCR provider.
+The `@happyvertical/ocr` package provides a unified Node.js interface for Optical Character Recognition (OCR) operations with provider selection and fallback support. It abstracts away the complexities of different OCR engines while keeping the package entrypoint optimized for server-side use.
 
 ## Features
 
-- **Multi-Provider Support**: Unified API for Tesseract.js and ONNX-based OCR engines (PaddleOCR PP-OCRv4)
+- **Multi-Provider Support**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), and HappyVertical AI-backed vision OCR
 - **Intelligent Fallback**: Automatic provider selection and fallback when primary providers fail
-- **Cross-Platform**: Works in both Node.js and browser environments with appropriate providers
-- **Environment Detection**: Automatically selects compatible OCR providers based on runtime environment
+- **Node-First Runtime**: Optimized for Node.js packages and server-side workflows
+- **Environment Detection**: Selects compatible OCR providers based on runtime environment
 - **Performance Optimized**: Lazy loading of OCR dependencies and efficient provider management
 - **Multi-Language Support**: 60+ languages with Tesseract, 7 core languages with ONNX
 - **Bounding Box Detection**: Word-level and line-level text positioning
@@ -43,7 +43,7 @@ yarn add @happyvertical/ocr
 bun add @happyvertical/ocr
 ```
 
-The package includes Tesseract.js by default and ONNX provider (@gutenye/ocr-node) for high-accuracy OCR.
+The package includes Tesseract.js by default, ONNX provider support through `@gutenye/ocr-node`, and LLM-backed OCR through `@happyvertical/ai`.
 
 ## Quick Start
 
@@ -91,8 +91,7 @@ const onnxFactory = getOCR({ provider: 'onnx' });
 
 const result = await onnxFactory.performOCR(images, {
   language: 'eng',
-  confidenceThreshold: 85,
-  outputFormat: 'json'  // Get detailed bounding boxes
+  confidenceThreshold: 85
 });
 
 // Access bounding box information
@@ -109,13 +108,13 @@ result.detections?.forEach((detection) => {
 
 ### Tesseract Provider (Node.js)
 
-Cross-platform OCR using Tesseract.js with WebAssembly. Good accuracy on machine-printed text with wide language support.
+Node.js OCR using Tesseract.js with wide language support. Good accuracy on machine-printed text.
 
 **Features:**
 - 60+ languages with automatic model downloading
 - Word-level confidence scores and bounding boxes
 - Zero system dependencies
-- Works in Node.js and browsers
+- Works in Node.js without system OCR dependencies
 
 **Example:**
 ```typescript
@@ -132,29 +131,31 @@ console.log('Text extracted:', result.text);
 console.log('Languages used:', result.metadata?.language);
 ```
 
-### Web OCR Provider (Browser)
+### LLM OCR Provider (Node.js)
 
-Browser-optimized Tesseract.js with progress tracking and memory management for client-side OCR processing.
+Vision-model OCR uses `@happyvertical/ai` for the underlying AI client so OCR callers do not instantiate model SDKs directly.
 
 **Features:**
-- Client-side processing for privacy
-- Progress tracking for user feedback
-- Automatic resource cleanup
-- WebAssembly and Web Worker compatibility checking
+- Works with HappyVertical AI-compatible vision models
+- Supports API-key or OAuth2-backed endpoints
+- Can return plain text or structured text segments
 
 **Example:**
 ```typescript
-import { getOCR } from '@happyvertical/ocr';
+import { LiteLLMProvider } from '@happyvertical/ocr';
 
-const webFactory = getOCR({ provider: 'web-ocr' });
-
-const result = await webFactory.performOCR(images, {
-  language: 'eng',
-  confidenceThreshold: 70,
-  outputFormat: 'text'
+const provider = new LiteLLMProvider({
+  baseUrl: 'https://litellm.example.com/v1',
+  apiKey: process.env.HAVE_OCR_LITELLM_API_KEY,
+  model: 'gpt-4o',
+  outputMode: 'structured'
 });
 
-console.log('Browser OCR completed:', result.text);
+const result = await provider.performOCR(images, {
+  language: 'eng'
+});
+
+console.log('LLM OCR completed:', result.text);
 ```
 
 ## Advanced Usage
@@ -190,19 +191,14 @@ import { getOCR } from '@happyvertical/ocr';
 const ocrFactory = getOCR();
 const environment = ocrFactory.getEnvironment();
 
-if (environment === 'node') {
-  // Node.js environment - multiple providers available
-  const result = await ocrFactory.performOCR(images, {
-    language: 'eng',
-    confidenceThreshold: 85
-  });
-} else if (environment === 'browser') {
-  // Browser environment - use Web OCR
-  const result = await ocrFactory.performOCR(images, {
-    language: 'eng',
-    confidenceThreshold: 70
-  });
+if (environment !== 'node') {
+  throw new Error('@happyvertical/ocr is intended for Node.js runtimes');
 }
+
+const result = await ocrFactory.performOCR(images, {
+  language: 'eng',
+  confidenceThreshold: 85
+});
 ```
 
 ### Custom Factory Configuration
@@ -215,9 +211,7 @@ const customFactory = new OCRFactory({
   fallbackProviders: ['tesseract'],   // Fallback chain
   defaultOptions: {
     language: 'eng',
-    confidenceThreshold: 85,
-    outputFormat: 'json',
-    timeout: 45000
+    confidenceThreshold: 85
   }
 });
 

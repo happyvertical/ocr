@@ -6,7 +6,7 @@
 
 # Interface: OCRCapabilities
 
-Defined in: [src/shared/types.ts:133](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L133)
+Defined in: [src/shared/types.ts:132](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L132)
 
 OCR provider capabilities information
 
@@ -16,7 +16,7 @@ OCR provider capabilities information
 
 > **canPerformOCR**: `boolean`
 
-Defined in: [src/shared/types.ts:135](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L135)
+Defined in: [src/shared/types.ts:134](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L134)
 
 Whether the provider can perform OCR
 
@@ -26,7 +26,7 @@ Whether the provider can perform OCR
 
 > **supportedLanguages**: `string`[]
 
-Defined in: [src/shared/types.ts:137](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L137)
+Defined in: [src/shared/types.ts:136](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L136)
 
 List of supported languages
 
@@ -36,7 +36,7 @@ List of supported languages
 
 > `optional` **maxImageSize?**: `number`
 
-Defined in: [src/shared/types.ts:139](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L139)
+Defined in: [src/shared/types.ts:138](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L138)
 
 Maximum supported image size in pixels
 
@@ -46,7 +46,7 @@ Maximum supported image size in pixels
 
 > `optional` **supportedFormats?**: `string`[]
 
-Defined in: [src/shared/types.ts:141](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L141)
+Defined in: [src/shared/types.ts:140](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L140)
 
 Supported image formats
 
@@ -56,7 +56,7 @@ Supported image formats
 
 > `optional` **hasConfidenceScores?**: `boolean`
 
-Defined in: [src/shared/types.ts:143](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L143)
+Defined in: [src/shared/types.ts:142](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L142)
 
 Whether the provider supports confidence scores
 
@@ -66,7 +66,7 @@ Whether the provider supports confidence scores
 
 > `optional` **hasBoundingBoxes?**: `boolean`
 
-Defined in: [src/shared/types.ts:145](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L145)
+Defined in: [src/shared/types.ts:144](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L144)
 
 Whether the provider supports bounding boxes
 
@@ -76,6 +76,6 @@ Whether the provider supports bounding boxes
 
 > `optional` **providerSpecific?**: `Record`\<`string`, `any`\>
 
-Defined in: [src/shared/types.ts:147](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L147)
+Defined in: [src/shared/types.ts:146](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L146)
 
 Provider-specific capabilities

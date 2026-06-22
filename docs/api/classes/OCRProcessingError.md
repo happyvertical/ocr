@@ -6,7 +6,7 @@
 
 # Class: OCRProcessingError
 
-Defined in: [src/shared/types.ts:248](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L248)
+Defined in: [src/shared/types.ts:252](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L252)
 
 Error thrown when an OCR provider fails while processing image data.
 
@@ -20,7 +20,7 @@ Error thrown when an OCR provider fails while processing image data.
 
 > **new OCRProcessingError**(`provider`, `message`, `context?`): `OCRProcessingError`
 
-Defined in: [src/shared/types.ts:249](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L249)
+Defined in: [src/shared/types.ts:253](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L253)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: [src/shared/types.ts:249](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **provider?**: `string`
 
-Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L209)
+Defined in: [src/shared/types.ts:213](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L213)
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: [src/shared/types.ts:209](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **context?**: `any`
 
-Defined in: [src/shared/types.ts:210](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L210)
+Defined in: [src/shared/types.ts:214](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L214)
 
 #### Inherited from
 
