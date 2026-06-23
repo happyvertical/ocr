@@ -388,6 +388,10 @@ pnpm pack --dry-run
 Coverage uses Vitest V8 coverage and gates statements, branches, functions, and
 lines at `80/65/80/80`.
 
+Releases publish to the public npm registry (`registry.npmjs.org`) through the
+Changesets publish workflow. The workflow expects the repository `NPM_TOKEN`
+secret to be configured.
+
 ## API Reference
 
 Generated API reference documentation lives in `docs/api/` and is built from

@@ -18,3 +18,9 @@
 - Run `pnpm test:coverage` before shipping test or behavior changes.
 - Coverage uses Vitest V8 coverage with all source files included.
 - Global thresholds are `80/65/80/80` for statements, branches, functions, and lines.
+
+## Publishing
+
+- Releases publish `@happyvertical/ocr` to the public npm registry (`registry.npmjs.org`).
+- CI publishing requires the repository `NPM_TOKEN` secret and uses npm provenance (`id-token: write`).
+- Keep `@happyvertical` package resolution pointed at npmjs unless a package-specific dependency still requires GitHub Packages.
