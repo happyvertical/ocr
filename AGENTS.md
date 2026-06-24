@@ -22,5 +22,5 @@
 ## Publishing
 
 - Releases publish `@happyvertical/ocr` to the public npm registry (`registry.npmjs.org`).
-- CI publishing requires the repository `NPM_TOKEN` secret and uses npm provenance (`id-token: write`).
+- CI publishing requires the repository `NPM_TOKEN` secret.
 - Keep `@happyvertical` package resolution pointed at npmjs unless a package-specific dependency still requires GitHub Packages.

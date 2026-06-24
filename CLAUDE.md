@@ -814,8 +814,8 @@ CI runs build, typecheck, lint, `docs:api:check`, and `test:coverage`.
 
 Releases publish `@happyvertical/ocr` to the public npm registry
 (`registry.npmjs.org`). The publish workflow uses Changesets, requires the
-repository `NPM_TOKEN` secret, and enables npm provenance with GitHub
-`id-token: write` permissions.
+repository `NPM_TOKEN` secret, and publishes without npm provenance because the
+release job runs on HappyVertical self-hosted runners.
 
 Keep project-level `@happyvertical` package resolution pointed at npmjs for
 this package. If a future dependency is only available from GitHub Packages,
