@@ -1,5 +1,14 @@
 # @happyvertical/ocr
 
+## 0.60.52
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - disable npm provenance for publish (#101) (ocr)
+  - publish package to npm registry (#99) (ocr)
+
 ## 0.60.51
 
 ### Patch Changes
