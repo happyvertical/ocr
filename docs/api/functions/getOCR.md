@@ -8,7 +8,7 @@
 
 > **getOCR**(`options?`): [`OCRFactory`](../classes/OCRFactory.md)
 
-Defined in: [src/shared/factory.ts:799](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L799)
+Defined in: [src/shared/factory.ts:818](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L818)
 
 Get or create an OCR factory instance with automatic provider selection.
 
