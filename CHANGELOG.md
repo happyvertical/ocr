@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.60.54
+
+### Patch Changes
+
+- a64e222: Suppress optional OCR provider availability logs in auto mode when another provider is available.
+
 ## 0.60.53
 
 ### Patch Changes
