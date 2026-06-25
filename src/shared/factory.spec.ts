@@ -309,6 +309,40 @@ describe('OCRFactory environment variable configuration', () => {
     expect(fallback.performOCR).toHaveBeenCalledTimes(1);
   });
 
+  test('should continue through auto providers when the best result is empty', async () => {
+    const onnx = createMockProvider({
+      name: 'onnx',
+      performOCR: vi.fn().mockResolvedValue({
+        text: '',
+        confidence: 0,
+        detections: [],
+      }),
+    });
+    const tesseract = createMockProvider({
+      name: 'tesseract',
+      performOCR: vi.fn().mockResolvedValue({
+        text: 'tesseract text',
+        confidence: 82,
+        detections: [],
+      }),
+    });
+    const factory = new OCRFactory({
+      provider: 'auto',
+      defaultOptions: { language: 'eng' },
+    });
+    (factory as any).initialized = true;
+    factory.addProvider('onnx', onnx);
+    factory.addProvider('tesseract', tesseract);
+
+    const result = await factory.performOCR([{ data: Buffer.alloc(128) }]);
+
+    expect(result.text).toBe('tesseract text');
+    expect(result.metadata?.provider).toBe('tesseract');
+    expect(result.metadata?.fallbackFrom).toBe('onnx');
+    expect(onnx.performOCR).toHaveBeenCalledTimes(1);
+    expect(tesseract.performOCR).toHaveBeenCalledTimes(1);
+  });
+
   test('should ignore unavailable or failing fallback providers', async () => {
     const primary = createMockProvider({
       name: 'primary',

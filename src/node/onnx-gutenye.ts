@@ -304,7 +304,13 @@ export class ONNXGutenyeProvider implements OCRProvider {
         let height: number;
 
         // Handle different image input formats
-        if (image.data instanceof Buffer && image.width && image.height) {
+        if (
+          image.data instanceof Buffer &&
+          image.width &&
+          image.height &&
+          image.channels === 3 &&
+          image.data.byteLength === image.width * image.height * image.channels
+        ) {
           // Already RGB data with dimensions
           console.log(`Processing RGB data ${image.width}x${image.height}`);
           rgbData = image.data;
