@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.60.53
+
+### Patch Changes
+
+- 9db6012: Continue through the automatic provider chain when the first available OCR provider returns an empty result.
+
 ## 0.60.52
 
 ### Patch Changes
