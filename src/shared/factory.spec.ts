@@ -42,6 +42,7 @@ describe('OCRFactory environment variable configuration', () => {
     process.env = { ...originalEnv };
     // Reset factory after each test
     resetOCRFactory();
+    vi.restoreAllMocks();
   });
 
   test('should load provider from HAVE_OCR_PROVIDER', () => {
@@ -341,6 +342,115 @@ describe('OCRFactory environment variable configuration', () => {
     expect(result.metadata?.fallbackFrom).toBe('onnx');
     expect(onnx.performOCR).toHaveBeenCalledTimes(1);
     expect(tesseract.performOCR).toHaveBeenCalledTimes(1);
+  });
+
+  test('should suppress unavailable auto provider logs when another provider is available', async () => {
+    const debug = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const onnx = createMockProvider({ name: 'onnx' });
+    const tesseract = createMockProvider({
+      name: 'tesseract',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        error: 'Tesseract missing',
+        details: {},
+      }),
+    });
+    const litellm = createMockProvider({
+      name: 'litellm',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        error: 'LiteLLM API key not configured',
+        details: {},
+      }),
+    });
+    const factory = new OCRFactory({ provider: 'auto' });
+    (factory as any).initialized = true;
+    factory.addProvider('onnx', onnx);
+    factory.addProvider('tesseract', tesseract);
+    factory.addProvider('litellm', litellm);
+
+    const providers = await (factory as any).getAvailableProviderChain();
+
+    expect(providers.map((provider: OCRProvider) => provider.name)).toEqual([
+      'onnx',
+    ]);
+    expect(debug).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  test('should log unavailable auto providers when no providers are available', async () => {
+    const debug = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    const onnx = createMockProvider({
+      name: 'onnx',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        error: 'ONNX missing',
+        details: {},
+      }),
+    });
+    const tesseract = createMockProvider({
+      name: 'tesseract',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        error: 'Tesseract missing',
+        details: {},
+      }),
+    });
+    const factory = new OCRFactory({ provider: 'auto' });
+    (factory as any).initialized = true;
+    factory.addProvider('onnx', onnx);
+    factory.addProvider('tesseract', tesseract);
+
+    const providers = await (factory as any).getAvailableProviderChain();
+
+    expect(providers).toEqual([]);
+    expect(debug).toHaveBeenCalledWith(
+      "OCR provider 'onnx' not available:",
+      'ONNX missing',
+    );
+    expect(debug).toHaveBeenCalledWith(
+      "OCR provider 'tesseract' not available:",
+      'Tesseract missing',
+    );
+  });
+
+  test('should warn when the requested primary provider is unavailable', async () => {
+    const debug = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const onnx = createMockProvider({
+      name: 'onnx',
+      checkDependencies: vi.fn().mockResolvedValue({
+        available: false,
+        error: 'ONNX missing',
+        details: {},
+      }),
+    });
+    const tesseract = createMockProvider({ name: 'tesseract' });
+    const factory = new OCRFactory({
+      provider: 'onnx',
+      fallbackProviders: ['tesseract'],
+    });
+    (factory as any).initialized = true;
+    factory.addProvider('onnx', onnx);
+    factory.addProvider('tesseract', tesseract);
+
+    const providers = await (factory as any).getAvailableProviderChain();
+
+    expect(providers.map((provider: OCRProvider) => provider.name)).toEqual([
+      'tesseract',
+    ]);
+    expect(warn).toHaveBeenCalledWith(
+      "OCR provider 'onnx' not available:",
+      'ONNX missing',
+    );
+    expect(debug).not.toHaveBeenCalled();
   });
 
   test('should ignore unavailable or failing fallback providers', async () => {

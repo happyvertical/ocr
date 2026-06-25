@@ -338,12 +338,12 @@ export class OCRFactory {
           error: deps.error,
         };
       } catch (error) {
-        console.debug(`OCR provider '${providerName}' check failed:`, error);
-        return { name: providerName, available: false, provider: null };
+        return { name: providerName, available: false, provider: null, error };
       }
     });
 
     const results = await Promise.all(providerChecks);
+    const hasAvailableProvider = results.some((result) => result.available);
     const providers: OCRProvider[] = [];
 
     for (const providerName of providerPriority) {
@@ -353,7 +353,12 @@ export class OCRFactory {
         continue;
       }
 
-      if (result && !result.available && result.error) {
+      if (
+        result &&
+        !result.available &&
+        result.error &&
+        this.shouldLogUnavailableProvider(providerName, hasAvailableProvider)
+      ) {
         const log =
           this.primaryProvider !== 'auto' &&
           providerName === this.primaryProvider
@@ -732,6 +737,20 @@ export class OCRFactory {
    */
   getEnvironment(): OCREnvironment {
     return this.environment;
+  }
+
+  private shouldLogUnavailableProvider(
+    providerName: string,
+    hasAvailableProvider: boolean,
+  ): boolean {
+    if (
+      this.primaryProvider !== 'auto' &&
+      providerName === this.primaryProvider
+    ) {
+      return true;
+    }
+
+    return !hasAvailableProvider;
   }
 }
 

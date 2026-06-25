@@ -8,7 +8,7 @@
 
 > **getAvailableProviders**(): `Promise`\<`string`[]\>
 
-Defined in: [src/shared/factory.ts:863](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L863)
+Defined in: [src/shared/factory.ts:882](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L882)
 
 Get list of OCR provider names available in the current environment.
 
