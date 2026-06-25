@@ -279,63 +279,9 @@ export class OCRFactory {
    * ```
    */
   async getBestProvider(): Promise<OCRProvider | null> {
-    await this.initializeProviders();
-
-    // If a specific provider is requested, try to use it
-    if (this.primaryProvider !== 'auto') {
-      const provider = this.providers.get(this.primaryProvider);
-      if (provider) {
-        const deps = await provider.checkDependencies();
-        if (deps.available) {
-          return provider;
-        }
-        console.warn(
-          `Primary OCR provider '${this.primaryProvider}' not available:`,
-          deps.error,
-        );
-      }
-    }
-
-    // Auto-select or fall back to the best available provider
-    const providerPriority =
-      this.primaryProvider === 'auto'
-        ? this.getDefaultProviderPriority()
-        : [this.primaryProvider, ...this.fallbackProviders];
-
-    // Check all providers in parallel for faster detection
-    const providerChecks = providerPriority.map(async (providerName) => {
-      const provider = this.providers.get(providerName);
-      if (!provider)
-        return { name: providerName, available: false, provider: null };
-
-      try {
-        const deps = await provider.checkDependencies();
-        return {
-          name: providerName,
-          available: deps.available,
-          provider: deps.available ? provider : null,
-          error: deps.error,
-        };
-      } catch (error) {
-        console.debug(`OCR provider '${providerName}' check failed:`, error);
-        return { name: providerName, available: false, provider: null };
-      }
-    });
-
-    const results = await Promise.all(providerChecks);
-
-    // Return first available provider in priority order
-    for (const providerName of providerPriority) {
-      const result = results.find((r) => r.name === providerName);
-      if (result?.available && result.provider) {
-        return result.provider;
-      }
-      if (result && !result.available && result.error) {
-        console.debug(
-          `OCR provider '${providerName}' not available:`,
-          result.error,
-        );
-      }
+    const providers = await this.getAvailableProviderChain();
+    if (providers.length > 0) {
+      return providers[0];
     }
 
     console.warn(
@@ -363,6 +309,61 @@ export class OCRFactory {
       return ['tesseract', 'web-ocr'];
     }
     return ['tesseract'];
+  }
+
+  private getProviderPriority(): string[] {
+    const priority =
+      this.primaryProvider === 'auto'
+        ? [...this.getDefaultProviderPriority(), ...this.fallbackProviders]
+        : [this.primaryProvider, ...this.fallbackProviders];
+
+    return [...new Set(priority)];
+  }
+
+  private async getAvailableProviderChain(): Promise<OCRProvider[]> {
+    await this.initializeProviders();
+
+    const providerPriority = this.getProviderPriority();
+    const providerChecks = providerPriority.map(async (providerName) => {
+      const provider = this.providers.get(providerName);
+      if (!provider)
+        return { name: providerName, available: false, provider: null };
+
+      try {
+        const deps = await provider.checkDependencies();
+        return {
+          name: providerName,
+          available: deps.available,
+          provider: deps.available ? provider : null,
+          error: deps.error,
+        };
+      } catch (error) {
+        console.debug(`OCR provider '${providerName}' check failed:`, error);
+        return { name: providerName, available: false, provider: null };
+      }
+    });
+
+    const results = await Promise.all(providerChecks);
+    const providers: OCRProvider[] = [];
+
+    for (const providerName of providerPriority) {
+      const result = results.find((r) => r.name === providerName);
+      if (result?.available && result.provider) {
+        providers.push(result.provider);
+        continue;
+      }
+
+      if (result && !result.available && result.error) {
+        const log =
+          this.primaryProvider !== 'auto' &&
+          providerName === this.primaryProvider
+            ? console.warn
+            : console.debug;
+        log(`OCR provider '${providerName}' not available:`, result.error);
+      }
+    }
+
+    return providers;
   }
 
   /**
@@ -438,76 +439,58 @@ export class OCRFactory {
     // Merge default options with provided options
     const mergedOptions = { ...this.defaultOptions, ...options };
 
-    // Get the best available provider
-    const provider = await this.getBestProvider();
-    if (!provider) {
+    const providers = await this.getAvailableProviderChain();
+    if (providers.length === 0) {
       throw new OCRDependencyError('none', 'No OCR providers are available');
     }
 
-    try {
-      const startTime = Date.now();
-      const result = await provider.performOCR(images, mergedOptions);
-      const processingTime = Date.now() - startTime;
+    let firstEmptyResult: OCRResult | null = null;
+    let firstProviderName: string | undefined;
+    let lastError: unknown;
 
-      // Enhance result with metadata
-      result.metadata = {
-        ...result.metadata,
-        processingTime,
-        provider: provider.name,
-        language: mergedOptions.language,
-      };
+    for (const provider of providers) {
+      firstProviderName ??= provider.name;
 
-      // If result is empty and we have fallback providers, try them
-      if (
-        (!result.text || result.text.trim().length === 0) &&
-        this.fallbackProviders.length > 0
-      ) {
-        for (const fallbackName of this.fallbackProviders) {
-          if (fallbackName === provider.name) continue; // Skip if it's the same provider
+      try {
+        const startTime = Date.now();
+        const result = await provider.performOCR(images, mergedOptions);
+        const processingTime = Date.now() - startTime;
 
-          const fallbackProvider = this.providers.get(fallbackName);
-          if (fallbackProvider) {
-            try {
-              const deps = await fallbackProvider.checkDependencies();
-              if (deps.available) {
-                const fallbackResult = await fallbackProvider.performOCR(
-                  images,
-                  mergedOptions,
-                );
-                if (
-                  fallbackResult.text &&
-                  fallbackResult.text.trim().length > 0
-                ) {
-                  console.info(
-                    `OCR fallback to '${fallbackName}' provider succeeded`,
-                  );
-                  fallbackResult.metadata = {
-                    ...fallbackResult.metadata,
-                    provider: fallbackProvider.name,
-                    fallbackFrom: provider.name,
-                  };
-                  return fallbackResult;
-                }
-              }
-            } catch (fallbackError) {
-              console.warn(
-                `OCR fallback provider '${fallbackName}' failed:`,
-                fallbackError,
-              );
-            }
+        // Enhance result with metadata
+        result.metadata = {
+          ...result.metadata,
+          processingTime,
+          provider: provider.name,
+          language: mergedOptions.language,
+        };
+
+        if (result.text?.trim()) {
+          if (provider.name !== firstProviderName) {
+            console.info(
+              `OCR fallback to '${provider.name}' provider succeeded`,
+            );
+            result.metadata.fallbackFrom = firstProviderName;
           }
-        }
-      }
 
-      return result;
-    } catch (error) {
-      console.error(`OCR provider '${provider.name}' failed:`, error);
-      throw new OCRError(
-        `OCR processing failed: ${(error as Error).message}`,
-        provider.name,
-        error,
-      );
+          return result;
+        }
+
+        firstEmptyResult ??= result;
+      } catch (error) {
+        console.error(`OCR provider '${provider.name}' failed:`, error);
+        lastError = error;
+      }
     }
+
+    if (firstEmptyResult) {
+      return firstEmptyResult;
+    }
+
+    throw new OCRError(
+      `OCR processing failed: ${(lastError as Error)?.message ?? 'all providers failed'}`,
+      firstProviderName,
+      lastError,
+    );
   }
 
   /**

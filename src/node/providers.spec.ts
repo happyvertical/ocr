@@ -1,4 +1,5 @@
 import jpeg from 'jpeg-js';
+import { PNG } from 'pngjs';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ONNXGutenyeProvider } from './onnx-gutenye';
 import { TesseractProvider } from './tesseract';
@@ -212,6 +213,24 @@ describe('ONNXGutenyeProvider', () => {
 
     expect(result.text).toBe('JPEG text');
     expect(result.detections?.[0].boundingBox).toBeUndefined();
+  });
+
+  test('decodes encoded PNG buffers even when dimensions are present', async () => {
+    const png = new PNG({ width: 1, height: 1 });
+    png.data.set(Buffer.from([255, 0, 0, 255]));
+    const encoded = PNG.sync.write(png);
+    const detect = vi.fn().mockResolvedValue([{ text: 'PNG text', mean: 0.9 }]);
+    const provider = new ONNXGutenyeProvider();
+    const decodeSpy = vi.spyOn(provider as any, 'decodeImageToRGB');
+    (provider as any).initialized = true;
+    (provider as any).ocrInstance = { detect };
+
+    const result = await provider.performOCR([
+      { data: Buffer.from(encoded), width: 1, height: 1 },
+    ]);
+
+    expect(result.text).toBe('PNG text');
+    expect(decodeSpy).toHaveBeenCalledOnce();
   });
 
   test('skips unsupported and failed image inputs without throwing', async () => {
