@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.60.55
+
+### Patch Changes
+
+- ### Dependencies
+
+  - update actions/cache action to v6 (#104)
+
 ## 0.60.54
 
 ### Patch Changes
