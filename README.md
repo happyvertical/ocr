@@ -17,7 +17,7 @@ The `@happyvertical/ocr` package provides a unified Node.js interface for Optica
 
 ## Features
 
-- **Multi-Provider Support**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), and HappyVertical AI-backed vision OCR
+- **Multi-Provider Support**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), HappyVertical AI-backed vision OCR, and served Unlimited-OCR endpoints
 - **Intelligent Fallback**: Automatic provider selection and fallback when primary providers fail
 - **Node-First Runtime**: Optimized for Node.js packages and server-side workflows
 - **Environment Detection**: Selects compatible OCR providers based on runtime environment
@@ -25,7 +25,7 @@ The `@happyvertical/ocr` package provides a unified Node.js interface for Optica
 - **Multi-Language Support**: 60+ languages with Tesseract, 7 core languages with ONNX
 - **Bounding Box Detection**: Word-level and line-level text positioning
 - **Confidence Scoring**: Per-detection and overall confidence scores (0-100)
-- **Format Support**: PNG, JPEG, BMP, TIFF, raw RGB data, and base64 strings
+- **Format Support**: PNG, JPEG, BMP, TIFF, raw RGB data, base64 strings, and served vision-model OCR
 
 ## Installation
 
@@ -43,7 +43,7 @@ yarn add @happyvertical/ocr
 bun add @happyvertical/ocr
 ```
 
-The package includes Tesseract.js by default, ONNX provider support through `@gutenye/ocr-node`, and LLM-backed OCR through `@happyvertical/ai`.
+The package includes Tesseract.js by default, ONNX provider support through `@gutenye/ocr-node`, LLM-backed OCR through `@happyvertical/ai`, and a Node.js provider for Baidu Unlimited-OCR when you run it behind SGLang or Bifrost.
 
 ## Quick Start
 
@@ -157,6 +157,104 @@ const result = await provider.performOCR(images, {
 
 console.log('LLM OCR completed:', result.text);
 ```
+
+### Unlimited-OCR Provider (Node.js, Served GPU Model)
+
+The `unlimited-ocr` provider talks to a running [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) SGLang server through an OpenAI-compatible chat completions endpoint. The endpoint can be direct, or routed through HappyVertical Bifrost.
+
+This provider does not load the Python/CUDA model inside Node.js. You still need to run the model server somewhere with GPU access.
+
+**Direct SGLang endpoint:**
+
+```bash
+export HAVE_OCR_PROVIDER=unlimited-ocr
+export HAVE_OCR_UNLIMITED_TRANSPORT=direct
+export HAVE_OCR_UNLIMITED_BASE_URL=http://127.0.0.1:10000
+export HAVE_OCR_UNLIMITED_MODEL=Unlimited-OCR
+```
+
+```typescript
+import { getOCR } from '@happyvertical/ocr';
+
+const ocr = getOCR({ provider: 'unlimited-ocr' });
+
+const result = await ocr.performOCR([
+  { data: imageBuffer, format: 'png' }
+]);
+
+console.log(result.text);
+```
+
+**Bifrost-routed endpoint:**
+
+```bash
+export HAVE_OCR_PROVIDER=unlimited-ocr
+export HAVE_OCR_UNLIMITED_TRANSPORT=bifrost
+export HAVE_OCR_BIFROST_BASE_URL=https://bifrost.happyvertical.com
+export HAVE_OCR_BIFROST_API_KEY=<virtual-key>
+export HAVE_OCR_BIFROST_MODEL=Unlimited-OCR
+```
+
+```typescript
+import { getOCR } from '@happyvertical/ocr';
+
+const ocr = getOCR({
+  provider: 'unlimited-ocr',
+  fallbackProviders: ['tesseract']
+});
+
+const result = await ocr.performOCR([
+  { data: imageBuffer, format: 'png' }
+]);
+```
+
+**Programmatic configuration:**
+
+```typescript
+import { getOCR } from '@happyvertical/ocr';
+
+const ocr = getOCR({
+  provider: 'unlimited-ocr',
+  providerConfig: {
+    'unlimited-ocr': {
+      transport: 'direct',
+      baseUrl: 'http://127.0.0.1:10000',
+      model: 'Unlimited-OCR',
+      stream: true
+    }
+  }
+});
+```
+
+**Running the model server:**
+
+Follow the Unlimited-OCR model card for the exact SGLang environment. The documented server shape is:
+
+```bash
+python -m sglang.launch_server \
+  --model baidu/Unlimited-OCR \
+  --served-model-name Unlimited-OCR \
+  --attention-backend fa3 \
+  --page-size 1 \
+  --mem-fraction-static 0.8 \
+  --context-length 32768 \
+  --enable-custom-logit-processor \
+  --disable-overlap-schedule \
+  --skip-server-warmup \
+  --host 0.0.0.0 \
+  --port 10000
+```
+
+For best long-document output, Unlimited-OCR also supports SGLang's `custom_logit_processor`. If your gateway/proxy injects it, no library config is needed. If the client must send it, set `HAVE_OCR_UNLIMITED_CUSTOM_LOGIT_PROCESSOR` to the value produced by:
+
+```bash
+python - <<'PY'
+from sglang.srt.sampling.custom_logit_processor import DeepseekOCRNoRepeatNGramLogitProcessor
+print(DeepseekOCRNoRepeatNGramLogitProcessor.to_str())
+PY
+```
+
+The provider sends `gundam` image mode for one image and `base` image mode for multi-image/multi-page requests by default. Override with `HAVE_OCR_UNLIMITED_IMAGE_MODE=base` or `gundam` when needed.
 
 ## Advanced Usage
 

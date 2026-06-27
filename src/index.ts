@@ -90,6 +90,14 @@ export type {
 // Export LiteLLM provider for direct instantiation
 export { LiteLLMProvider } from './node/litellm';
 
+export type {
+  UnlimitedOCRImageMode,
+  UnlimitedOCRProviderConfig,
+  UnlimitedOCRTransport,
+} from './node/unlimited-ocr';
+// Export Unlimited-OCR provider for direct instantiation
+export { UnlimitedOCRProvider } from './node/unlimited-ocr';
+
 // Default export for convenience
 export { getOCR as default } from './shared/factory';
 

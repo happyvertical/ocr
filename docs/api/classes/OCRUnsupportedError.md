@@ -6,7 +6,7 @@
 
 # Class: OCRUnsupportedError
 
-Defined in: [src/shared/types.ts:251](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L251)
+Defined in: [src/shared/types.ts:248](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L248)
 
 Error thrown when a provider does not support a requested OCR operation.
 
@@ -20,7 +20,7 @@ Error thrown when a provider does not support a requested OCR operation.
 
 > **new OCRUnsupportedError**(`provider`, `operation`, `context?`): `OCRUnsupportedError`
 
-Defined in: [src/shared/types.ts:252](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L252)
+Defined in: [src/shared/types.ts:249](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L249)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: [src/shared/types.ts:252](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **provider?**: `string`
 
-Defined in: [src/shared/types.ts:226](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L226)
+Defined in: [src/shared/types.ts:223](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L223)
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: [src/shared/types.ts:226](https://github.com/happyvertical/ocr/blob/
 
 > `readonly` `optional` **context?**: `any`
 
-Defined in: [src/shared/types.ts:227](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L227)
+Defined in: [src/shared/types.ts:224](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L224)
 
 #### Inherited from
 

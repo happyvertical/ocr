@@ -8,7 +8,7 @@
 
 > **resetOCRFactory**(): `void`
 
-Defined in: [src/shared/factory.ts:852](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L852)
+Defined in: [src/shared/factory.ts:874](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L874)
 
 Reset the global OCR factory instance.
 

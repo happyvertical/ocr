@@ -8,6 +8,6 @@
 
 > **OCREnvironment** = `"node"` \| `"browser"` \| `"unknown"`
 
-Defined in: [src/shared/types.ts:289](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L289)
+Defined in: [src/shared/types.ts:286](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L286)
 
 Environment-specific provider availability

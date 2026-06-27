@@ -199,19 +199,16 @@ export interface OCRProvider {
  * OCR factory configuration options
  */
 export interface OCRFactoryOptions {
-  /** Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm') */
+  /** Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm', 'unlimited-ocr', etc.) */
   provider?: string;
   /** Fallback providers to try if primary fails */
   fallbackProviders?: string[];
   /** Default options for OCR operations */
   defaultOptions?: OCROptions;
   /**
-   * Reserved for provider-specific configuration.
-   *
-   * Built-in providers currently use constructor options or environment
-   * variables for provider-specific configuration.
+   * Provider-specific configuration.
    */
-  providerConfig?: Record<string, any>;
+  providerConfig?: Record<string, unknown>;
 }
 
 /**

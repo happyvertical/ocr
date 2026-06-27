@@ -40,7 +40,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "description": "Node-first OCR interface with support for Tesseract.js, ONNX (PaddleOCR), and HappyVertical AI-backed vision OCR",
+  "description": "Node-first OCR interface with support for Tesseract.js, ONNX (PaddleOCR), HappyVertical AI-backed vision OCR, and Unlimited-OCR",
   "keywords": [
     "ocr",
     "optical-character-recognition",
@@ -49,6 +49,9 @@
     "onnx",
     "paddleocr",
     "litellm",
+    "unlimited-ocr",
+    "sglang",
+    "bifrost",
     "vision-llm",
     "image-to-text",
     "text-recognition",

@@ -71,6 +71,7 @@ result.detections?.forEach(detection => {
 ## Classes
 
 - [LiteLLMProvider](classes/LiteLLMProvider.md)
+- [UnlimitedOCRProvider](classes/UnlimitedOCRProvider.md)
 - [OCRFactory](classes/OCRFactory.md)
 - [OCRError](classes/OCRError.md)
 - [OCRDependencyError](classes/OCRDependencyError.md)
@@ -81,6 +82,7 @@ result.detections?.forEach(detection => {
 
 - [OAuth2Config](interfaces/OAuth2Config.md)
 - [LiteLLMProviderConfig](interfaces/LiteLLMProviderConfig.md)
+- [UnlimitedOCRProviderConfig](interfaces/UnlimitedOCRProviderConfig.md)
 - [OCROptions](interfaces/OCROptions.md)
 - [OCRImage](interfaces/OCRImage.md)
 - [OCRResult](interfaces/OCRResult.md)
@@ -96,6 +98,8 @@ result.detections?.forEach(detection => {
 
 - [LiteLLMOutputMode](type-aliases/LiteLLMOutputMode.md)
 - [LiteLLMAuthType](type-aliases/LiteLLMAuthType.md)
+- [UnlimitedOCRTransport](type-aliases/UnlimitedOCRTransport.md)
+- [UnlimitedOCRImageMode](type-aliases/UnlimitedOCRImageMode.md)
 - [OCREnvironment](type-aliases/OCREnvironment.md)
 
 ## Functions

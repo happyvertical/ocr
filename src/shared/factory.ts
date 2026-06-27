@@ -102,6 +102,7 @@ export class OCRFactory {
   private primaryProvider = 'auto';
   private fallbackProviders: string[] = [];
   private defaultOptions?: OCROptions;
+  private providerConfig: Record<string, unknown>;
   private environment: OCREnvironment;
   private initialized = false;
 
@@ -184,6 +185,7 @@ export class OCRFactory {
     // Set provider configuration
     this.primaryProvider = config.provider || 'auto';
     this.fallbackProviders = options.fallbackProviders || [];
+    this.providerConfig = options.providerConfig || {};
 
     // Build defaultOptions from both config and user options
     // User-provided defaultOptions take precedence over env vars
@@ -236,9 +238,29 @@ export class OCRFactory {
         // LiteLLM provider (Node.js only) - uses vision LLMs for OCR
         try {
           const { LiteLLMProvider } = await import('../node/litellm.js');
-          this.providers.set('litellm', new LiteLLMProvider());
+          const providerOptions = this.providerConfig.litellm as
+            | ConstructorParameters<typeof LiteLLMProvider>[0]
+            | undefined;
+          this.providers.set('litellm', new LiteLLMProvider(providerOptions));
         } catch {
           // Ignore if LiteLLM provider fails to load
+        }
+
+        // Unlimited-OCR provider (Node.js only) - uses served GPU inference
+        try {
+          const { UnlimitedOCRProvider } = await import(
+            '../node/unlimited-ocr.js'
+          );
+          const providerOptions = (this.providerConfig['unlimited-ocr'] ??
+            this.providerConfig.unlimitedOCR) as
+            | ConstructorParameters<typeof UnlimitedOCRProvider>[0]
+            | undefined;
+          this.providers.set(
+            'unlimited-ocr',
+            new UnlimitedOCRProvider(providerOptions),
+          );
+        } catch {
+          // Ignore if Unlimited-OCR provider fails to load
         }
       } else if (this.environment === 'browser') {
         // Browser-specific providers
@@ -303,7 +325,7 @@ export class OCRFactory {
   private getDefaultProviderPriority(): string[] {
     if (this.environment === 'node') {
       // LiteLLM last since it's API-based (network latency, costs money)
-      return ['onnx', 'tesseract', 'litellm'];
+      return ['onnx', 'tesseract', 'unlimited-ocr', 'litellm'];
     }
     if (this.environment === 'browser') {
       return ['tesseract', 'web-ocr'];

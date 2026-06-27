@@ -18,7 +18,7 @@ OCR factory configuration options
 
 Defined in: [src/shared/types.ts:203](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L203)
 
-Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm')
+Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm', 'unlimited-ocr', etc.)
 
 ***
 
@@ -44,11 +44,8 @@ Default options for OCR operations
 
 ### providerConfig?
 
-> `optional` **providerConfig?**: `Record`\<`string`, `any`\>
+> `optional` **providerConfig?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [src/shared/types.ts:214](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L214)
+Defined in: [src/shared/types.ts:211](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L211)
 
-Reserved for provider-specific configuration.
-
-Built-in providers currently use constructor options or environment
-variables for provider-specific configuration.
+Provider-specific configuration.
