@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.61.0
+
+### Minor Changes
+
+- 50d19dd: Add a Node.js Unlimited-OCR provider for direct SGLang and Bifrost-routed OCR endpoints.
+
 ## 0.60.55
 
 ### Patch Changes
