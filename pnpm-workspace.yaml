@@ -1,2 +1,9 @@
 packages:
   - "."
+allowBuilds:
+  esbuild: false
+  lefthook: false
+  onnxruntime-node: false
+  protobufjs: false
+  sharp: false
+  tesseract.js: false

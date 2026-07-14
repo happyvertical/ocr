@@ -8,11 +8,10 @@ export default defineConfig({
     testTimeout: 120000,
     hookTimeout: 60000,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    // Vitest 4 replacement for poolOptions.forks.singleFork: true.
+    // Isolation stays enabled (default) because test files rely on
+    // per-file module state; only serial execution is required.
+    maxWorkers: 1,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
