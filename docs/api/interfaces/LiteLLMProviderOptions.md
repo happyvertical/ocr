@@ -6,7 +6,7 @@
 
 # Interface: LiteLLMProviderOptions
 
-Defined in: [src/shared/types.ts:317](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L317)
+Defined in: [src/shared/types.ts:314](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L314)
 
 LiteLLM provider configuration options
 
@@ -30,7 +30,7 @@ const options: LiteLLMProviderOptions = {
 
 > `optional` **baseUrl?**: `string`
 
-Defined in: [src/shared/types.ts:319](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L319)
+Defined in: [src/shared/types.ts:316](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L316)
 
 LiteLLM/DeepSeek API base URL
 
@@ -40,7 +40,7 @@ LiteLLM/DeepSeek API base URL
 
 > `optional` **apiKey?**: `string`
 
-Defined in: [src/shared/types.ts:321](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L321)
+Defined in: [src/shared/types.ts:318](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L318)
 
 API key for authentication
 
@@ -50,7 +50,7 @@ API key for authentication
 
 > `optional` **model?**: `string`
 
-Defined in: [src/shared/types.ts:323](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L323)
+Defined in: [src/shared/types.ts:320](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L320)
 
 Model to use (e.g., 'deepseek-chat', 'gpt-4o')
 
@@ -60,7 +60,7 @@ Model to use (e.g., 'deepseek-chat', 'gpt-4o')
 
 > `optional` **outputMode?**: `"simple"` \| `"structured"`
 
-Defined in: [src/shared/types.ts:325](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L325)
+Defined in: [src/shared/types.ts:322](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L322)
 
 Output mode: 'simple' for text-only, 'structured' for JSON with confidence
 
@@ -70,7 +70,7 @@ Output mode: 'simple' for text-only, 'structured' for JSON with confidence
 
 > `optional` **systemPrompt?**: `string`
 
-Defined in: [src/shared/types.ts:327](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L327)
+Defined in: [src/shared/types.ts:324](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L324)
 
 Custom system prompt (overrides default)
 
@@ -80,6 +80,6 @@ Custom system prompt (overrides default)
 
 > `optional` **timeout?**: `number`
 
-Defined in: [src/shared/types.ts:329](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L329)
+Defined in: [src/shared/types.ts:326](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L326)
 
 Request timeout in milliseconds

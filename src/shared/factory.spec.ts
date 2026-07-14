@@ -216,7 +216,13 @@ describe('OCRFactory environment variable configuration', () => {
   });
 
   test('should support all valid provider values', () => {
-    const validProviders = ['auto', 'tesseract', 'onnx', 'web-ocr'];
+    const validProviders = [
+      'auto',
+      'tesseract',
+      'onnx',
+      'web-ocr',
+      'unlimited-ocr',
+    ];
 
     for (const provider of validProviders) {
       process.env.HAVE_OCR_PROVIDER = provider;
@@ -550,5 +556,29 @@ describe('OCRFactory environment variable configuration', () => {
 
     expect(() => resetOCRFactory()).not.toThrow();
     expect(getOCR()).not.toBe(factory);
+  });
+
+  test('should pass provider-specific configuration to Unlimited-OCR', async () => {
+    const factory = new OCRFactory({
+      provider: 'unlimited-ocr',
+      providerConfig: {
+        'unlimited-ocr': {
+          baseUrl: 'http://localhost:10000',
+          stream: false,
+        },
+      },
+    });
+
+    const provider = await factory.getBestProvider();
+    const dependencies = await provider?.checkDependencies();
+
+    expect(provider?.name).toBe('unlimited-ocr');
+    expect(dependencies).toMatchObject({
+      available: true,
+      details: {
+        baseUrl: 'http://localhost:10000',
+        stream: false,
+      },
+    });
   });
 });
