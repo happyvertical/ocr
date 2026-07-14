@@ -162,6 +162,8 @@ console.log('LLM OCR completed:', result.text);
 
 The `unlimited-ocr` provider talks to a running [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) SGLang server through an OpenAI-compatible chat completions endpoint. The endpoint can be direct, or routed through HappyVertical Bifrost.
 
+When `transport` is not set explicitly, the provider stays on `direct` whenever an Unlimited-OCR base URL is supplied (`baseUrl` or `HAVE_OCR_UNLIMITED_BASE_URL`); Bifrost is inferred from Bifrost environment variables only when no direct endpoint is configured.
+
 This provider does not load the Python/CUDA model inside Node.js. You still need to run the model server somewhere with GPU access.
 
 **Direct SGLang endpoint:**

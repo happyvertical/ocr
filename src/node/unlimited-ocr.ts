@@ -199,22 +199,25 @@ export class UnlimitedOCRProvider implements OCRProvider {
 
   constructor(config: UnlimitedOCRProviderConfig = {}) {
     const envTransport = parseTransport(env(ENV_VARS.transport));
+    const directBaseUrl = config.baseUrl ?? env(ENV_VARS.baseUrl);
     const hasBifrostSignal = Boolean(
       env(ENV_VARS.bifrostBaseUrl) ||
         env(ENV_VARS.bifrostApiKey) ||
         env('BIFROST_BASE_URL') ||
         env('BIFROST_API_KEY'),
     );
+    // Bifrost env vars may belong to another client in the same process, so
+    // an explicitly supplied Unlimited-OCR base URL keeps direct transport
+    // unless a transport is explicitly configured.
     const transport =
       config.transport ??
       envTransport ??
-      (hasBifrostSignal ? 'bifrost' : 'direct');
+      (hasBifrostSignal && !directBaseUrl ? 'bifrost' : 'direct');
 
     this.config = {
       transport,
       baseUrl:
-        config.baseUrl ??
-        env(ENV_VARS.baseUrl) ??
+        directBaseUrl ??
         (transport === 'bifrost'
           ? (env(ENV_VARS.bifrostBaseUrl) ?? env('BIFROST_BASE_URL'))
           : undefined),

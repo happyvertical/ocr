@@ -140,6 +140,88 @@ describe('UnlimitedOCRProvider', () => {
     expect(result.metadata?.transport).toBe('bifrost');
   });
 
+  test('keeps direct transport for an explicit base URL despite ambient Bifrost env', async () => {
+    delete process.env.HAVE_OCR_UNLIMITED_TRANSPORT;
+    process.env.BIFROST_BASE_URL = 'https://bifrost.happyvertical.com';
+    process.env.BIFROST_API_KEY = 'ambient-key';
+
+    const fetchMock = vi.fn(
+      async (input: Parameters<typeof fetch>[0], _init?: RequestInit) => {
+        expect(String(input)).toBe(
+          'http://127.0.0.1:10000/v1/chat/completions',
+        );
+        return Response.json({
+          choices: [{ message: { content: 'Direct text' } }],
+        });
+      },
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const provider = new UnlimitedOCRProvider({
+      baseUrl: 'http://127.0.0.1:10000',
+      stream: false,
+    });
+
+    const result = await provider.performOCR([{ data: pngBuffer() }]);
+
+    expect(result.text).toBe('Direct text');
+    expect(result.metadata?.transport).toBe('direct');
+  });
+
+  test('keeps direct transport for a direct base URL env despite ambient Bifrost env', async () => {
+    delete process.env.HAVE_OCR_UNLIMITED_TRANSPORT;
+    process.env.HAVE_OCR_UNLIMITED_BASE_URL = 'http://127.0.0.1:10000';
+    process.env.BIFROST_BASE_URL = 'https://bifrost.happyvertical.com';
+    process.env.BIFROST_API_KEY = 'ambient-key';
+
+    const fetchMock = vi.fn(
+      async (input: Parameters<typeof fetch>[0], _init?: RequestInit) => {
+        expect(String(input)).toBe(
+          'http://127.0.0.1:10000/v1/chat/completions',
+        );
+        return Response.json({
+          choices: [{ message: { content: 'Direct env text' } }],
+        });
+      },
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const provider = new UnlimitedOCRProvider({ stream: false });
+
+    const result = await provider.performOCR([{ data: pngBuffer() }]);
+
+    expect(result.text).toBe('Direct env text');
+    expect(result.metadata?.transport).toBe('direct');
+  });
+
+  test('infers bifrost transport from ambient Bifrost env when no direct endpoint is set', async () => {
+    delete process.env.HAVE_OCR_UNLIMITED_TRANSPORT;
+    delete process.env.HAVE_OCR_UNLIMITED_BASE_URL;
+    delete process.env.HAVE_OCR_BIFROST_BASE_URL;
+    delete process.env.HAVE_OCR_BIFROST_API_KEY;
+    process.env.BIFROST_BASE_URL = 'https://bifrost.happyvertical.com';
+    process.env.BIFROST_API_KEY = 'ambient-key';
+
+    const fetchMock = vi.fn(
+      async (input: Parameters<typeof fetch>[0], _init?: RequestInit) => {
+        expect(String(input)).toBe(
+          'https://bifrost.happyvertical.com/openai/chat/completions',
+        );
+        return Response.json({
+          choices: [{ message: { content: 'Gateway text' } }],
+        });
+      },
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const provider = new UnlimitedOCRProvider({ stream: false });
+
+    const result = await provider.performOCR([{ data: pngBuffer() }]);
+
+    expect(result.text).toBe('Gateway text');
+    expect(result.metadata?.transport).toBe('bifrost');
+  });
+
   test('uses base mode and multi-page prompt for multiple images', async () => {
     const fetchMock = vi.fn(
       async (_input: Parameters<typeof fetch>[0], init?: RequestInit) => {

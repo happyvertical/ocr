@@ -52,7 +52,7 @@ Provider name identifier
 
 > **performOCR**(`images`, `options?`): `Promise`\<[`OCRResult`](../interfaces/OCRResult.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:259](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L259)
+Defined in: [src/node/unlimited-ocr.ts:262](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L262)
 
 Perform OCR on image data
 
@@ -80,7 +80,7 @@ Perform OCR on image data
 
 > **checkDependencies**(): `Promise`\<[`DependencyCheckResult`](../interfaces/DependencyCheckResult.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:358](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L358)
+Defined in: [src/node/unlimited-ocr.ts:361](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L361)
 
 Check if provider dependencies are available
 
@@ -98,7 +98,7 @@ Check if provider dependencies are available
 
 > **checkCapabilities**(): `Promise`\<[`OCRCapabilities`](../interfaces/OCRCapabilities.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:399](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L399)
+Defined in: [src/node/unlimited-ocr.ts:402](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L402)
 
 Get provider capabilities
 
@@ -116,7 +116,7 @@ Get provider capabilities
 
 > **getSupportedLanguages**(): `string`[]
 
-Defined in: [src/node/unlimited-ocr.ts:416](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L416)
+Defined in: [src/node/unlimited-ocr.ts:419](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L419)
 
 Get supported languages
 
@@ -134,7 +134,7 @@ Get supported languages
 
 > **cleanup**(): `Promise`\<`void`\>
 
-Defined in: [src/node/unlimited-ocr.ts:452](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L452)
+Defined in: [src/node/unlimited-ocr.ts:455](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L455)
 
 Clean up provider resources (optional)
 
