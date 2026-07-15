@@ -1,5 +1,12 @@
 # @happyvertical/ocr
 
+## 0.61.1
+
+### Patch Changes
+
+- f602a15: Replace the stale `@gutenye/ocr-node` wrapper with a package-owned PaddleOCR backend on Sharp 0.35.3 and ONNX Runtime 1.27.0, align HappyVertical dependencies with SDK 0.80.0, and update the remaining direct dependency stack.
+- f602a15: Apply org toolchain standards: pnpm 11.13.0, TypeScript 6.0.3, Vitest 4.1.10, Vite 8.1.4, Biome 2.5.4, and Lefthook 2.1.10. Migrate the Vitest config off the removed `poolOptions` setting. No public API changes.
+
 ## 0.61.0
 
 ### Minor Changes
