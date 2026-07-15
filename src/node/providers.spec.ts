@@ -161,11 +161,13 @@ describe('ONNXGutenyeProvider', () => {
     const provider = new ONNXGutenyeProvider();
     (provider as any).initialized = true;
     (provider as any).ocrInstance = { detect };
+    const paddedPixels = new Uint8Array([99, 255, 0, 0, 0, 255, 0, 88]);
+    const pixels = paddedPixels.subarray(1, 7);
 
     const result = await provider.performOCR(
       [
         {
-          data: Buffer.from([255, 0, 0, 0, 255, 0]),
+          data: pixels,
           width: 2,
           height: 1,
           channels: 3,
@@ -194,6 +196,10 @@ describe('ONNXGutenyeProvider', () => {
       },
       { language: 'eng' },
     );
+    const nativePixels = detect.mock.calls[0][0].data as Buffer;
+    expect(nativePixels.buffer).toBe(pixels.buffer);
+    expect(nativePixels.byteOffset).toBe(pixels.byteOffset);
+    expect(nativePixels.byteLength).toBe(pixels.byteLength);
   });
 
   test('passes encoded JPEG buffers to the native image path', async () => {
@@ -286,12 +292,15 @@ describe('ONNXGutenyeProvider', () => {
     const encoded = await readFile(
       new URL('../../test/test.png', import.meta.url),
     );
+    const padded = new Uint8Array(encoded.length + 4);
+    padded.set(encoded, 2);
+    const encodedView = padded.subarray(2, 2 + encoded.length);
     const provider = new ONNXGutenyeProvider();
 
     try {
       const results = await Promise.all([
         provider.performOCR([{ data: encoded }]),
-        provider.performOCR([{ data: encoded }]),
+        provider.performOCR([{ data: encodedView }]),
       ]);
 
       expect(results.every((result) => result.text.trim().length > 0)).toBe(

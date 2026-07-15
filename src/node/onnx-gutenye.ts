@@ -218,7 +218,17 @@ export class ONNXGutenyeProvider implements OCRProvider {
   }
 
   private toNativeInput(image: OCRImage): GutenyeImageInput | null {
-    if (!(image.data instanceof Buffer) || image.data.length === 0) {
+    const data =
+      image.data instanceof Buffer
+        ? image.data
+        : image.data instanceof Uint8Array
+          ? Buffer.from(
+              image.data.buffer,
+              image.data.byteOffset,
+              image.data.byteLength,
+            )
+          : null;
+    if (!data || data.length === 0) {
       return null;
     }
 
@@ -226,17 +236,17 @@ export class ONNXGutenyeProvider implements OCRProvider {
       image.width &&
       image.height &&
       (image.channels === 3 || image.channels === 4) &&
-      image.data.byteLength === image.width * image.height * image.channels
+      data.byteLength === image.width * image.height * image.channels
     ) {
       return {
-        data: image.data,
+        data,
         width: image.width,
         height: image.height,
         channels: image.channels,
       };
     }
 
-    return image.data;
+    return data;
   }
 
   private collectDetections(
