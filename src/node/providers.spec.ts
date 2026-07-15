@@ -1,6 +1,8 @@
-import jpeg from 'jpeg-js';
-import { PNG } from 'pngjs';
+import { readFile } from 'node:fs/promises';
+import { InferenceSession } from 'onnxruntime-node';
+import sharp from 'sharp';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { nativeDependencyVersions, SharpImageRaw } from './gutenye-runtime';
 import { ONNXGutenyeProvider } from './onnx-gutenye';
 import { TesseractProvider } from './tesseract';
 
@@ -159,11 +161,13 @@ describe('ONNXGutenyeProvider', () => {
     const provider = new ONNXGutenyeProvider();
     (provider as any).initialized = true;
     (provider as any).ocrInstance = { detect };
+    const paddedPixels = new Uint8Array([99, 255, 0, 0, 0, 255, 0, 88]);
+    const pixels = paddedPixels.subarray(1, 7);
 
     const result = await provider.performOCR(
       [
         {
-          data: Buffer.from([255, 0, 0, 0, 255, 0]),
+          data: pixels,
           width: 2,
           height: 1,
           channels: 3,
@@ -183,20 +187,32 @@ describe('ONNXGutenyeProvider', () => {
       },
     ]);
     expect(result.metadata?.detectionCount).toBe(2);
-    expect(detect).toHaveBeenCalledWith(expect.any(Buffer), {
-      language: 'eng',
-    });
+    expect(detect).toHaveBeenCalledWith(
+      {
+        data: Buffer.from([255, 0, 0, 0, 255, 0]),
+        width: 2,
+        height: 1,
+        channels: 3,
+      },
+      { language: 'eng' },
+    );
+    const nativePixels = detect.mock.calls[0][0].data as Buffer;
+    expect(nativePixels.buffer).toBe(pixels.buffer);
+    expect(nativePixels.byteOffset).toBe(pixels.byteOffset);
+    expect(nativePixels.byteLength).toBe(pixels.byteLength);
   });
 
-  test('decodes JPEG buffers through the standard image path', async () => {
-    const encoded = jpeg.encode(
-      {
-        data: Buffer.from([255, 0, 0, 255]),
+  test('passes encoded JPEG buffers to the native image path', async () => {
+    const encoded = await sharp({
+      create: {
         width: 1,
         height: 1,
+        channels: 4,
+        background: { r: 255, g: 0, b: 0, alpha: 1 },
       },
-      90,
-    );
+    })
+      .jpeg()
+      .toBuffer();
     const detect = vi.fn().mockResolvedValue([
       {
         text: 'JPEG text',
@@ -207,21 +223,26 @@ describe('ONNXGutenyeProvider', () => {
     (provider as any).initialized = true;
     (provider as any).ocrInstance = { detect };
 
-    const result = await provider.performOCR([
-      { data: Buffer.from(encoded.data) },
-    ]);
+    const result = await provider.performOCR([{ data: encoded }]);
 
     expect(result.text).toBe('JPEG text');
     expect(result.detections?.[0].boundingBox).toBeUndefined();
+    expect(detect).toHaveBeenCalledWith(encoded, { language: 'eng' });
   });
 
-  test('decodes encoded PNG buffers even when dimensions are present', async () => {
-    const png = new PNG({ width: 1, height: 1 });
-    png.data.set(Buffer.from([255, 0, 0, 255]));
-    const encoded = PNG.sync.write(png);
+  test('keeps encoded PNG buffers encoded when dimensions are present', async () => {
+    const encoded = await sharp({
+      create: {
+        width: 1,
+        height: 1,
+        channels: 4,
+        background: { r: 255, g: 0, b: 0, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer();
     const detect = vi.fn().mockResolvedValue([{ text: 'PNG text', mean: 0.9 }]);
     const provider = new ONNXGutenyeProvider();
-    const decodeSpy = vi.spyOn(provider as any, 'decodeImageToRGB');
     (provider as any).initialized = true;
     (provider as any).ocrInstance = { detect };
 
@@ -230,7 +251,69 @@ describe('ONNXGutenyeProvider', () => {
     ]);
 
     expect(result.text).toBe('PNG text');
-    expect(decodeSpy).toHaveBeenCalledOnce();
+    expect(detect).toHaveBeenCalledWith(encoded, { language: 'eng' });
+  });
+
+  test('loads encoded and raw pixels through Sharp 0.35.3', async () => {
+    const encoded = await sharp({
+      create: {
+        width: 2,
+        height: 1,
+        channels: 4,
+        background: { r: 25, g: 50, b: 75, alpha: 1 },
+      },
+    })
+      .png()
+      .toBuffer();
+    const encodedImage = await SharpImageRaw.open(encoded);
+    const rawImage = await SharpImageRaw.open({
+      data: Buffer.from([255, 0, 0, 0, 255, 0]),
+      width: 2,
+      height: 1,
+      channels: 3,
+    });
+
+    expect(nativeDependencyVersions).toEqual({
+      sharp: '0.35.3',
+      onnxRuntime: '1.27.0',
+    });
+    expect(encodedImage.getImageRawData()).toMatchObject({
+      width: 2,
+      height: 1,
+    });
+    expect(encodedImage.data).toHaveLength(8);
+    expect(rawImage.getImageRawData()).toMatchObject({ width: 2, height: 1 });
+    expect(rawImage.data).toHaveLength(8);
+  });
+
+  test('initializes one real native backend and releases its sessions', async () => {
+    const createSession = vi.spyOn(InferenceSession, 'create');
+    const releaseSession = vi.spyOn(InferenceSession.prototype, 'release');
+    const encoded = await readFile(
+      new URL('../../test/test.png', import.meta.url),
+    );
+    const padded = new Uint8Array(encoded.length + 4);
+    padded.set(encoded, 2);
+    const encodedView = padded.subarray(2, 2 + encoded.length);
+    const provider = new ONNXGutenyeProvider();
+
+    try {
+      const results = await Promise.all([
+        provider.performOCR([{ data: encoded }]),
+        provider.performOCR([{ data: encodedView }]),
+      ]);
+
+      expect(results.every((result) => result.text.trim().length > 0)).toBe(
+        true,
+      );
+      expect(createSession).toHaveBeenCalledTimes(2);
+      await provider.cleanup();
+      expect(releaseSession).toHaveBeenCalledTimes(2);
+    } finally {
+      await provider.cleanup();
+      createSession.mockRestore();
+      releaseSession.mockRestore();
+    }
   });
 
   test('skips unsupported and failed image inputs without throwing', async () => {
@@ -269,5 +352,54 @@ describe('ONNXGutenyeProvider', () => {
     expect(cleanup).toHaveBeenCalledTimes(1);
     expect((provider as any).ocrInstance).toBeNull();
     expect((provider as any).initialized).toBe(false);
+  });
+
+  test('waits for active OCR and serializes concurrent cleanup calls', async () => {
+    let finishDetection:
+      | ((value: Array<{ text: string; mean: number }>) => void)
+      | null = null;
+    const detect = vi.fn(
+      () =>
+        new Promise<Array<{ text: string; mean: number }>>((resolve) => {
+          finishDetection = resolve;
+        }),
+    );
+    const cleanup = vi.fn().mockResolvedValue(undefined);
+    const provider = new ONNXGutenyeProvider();
+    (provider as any).initialized = true;
+    (provider as any).ocrInstance = { detect, cleanup };
+
+    const operation = provider.performOCR([{ data: pngBuffer }]);
+    await vi.waitFor(() => expect(detect).toHaveBeenCalledTimes(1));
+    const firstCleanup = provider.cleanup();
+    const secondCleanup = provider.cleanup();
+
+    expect(firstCleanup).toBe(secondCleanup);
+    expect(cleanup).not.toHaveBeenCalled();
+    finishDetection?.([{ text: 'Finished', mean: 0.9 }]);
+
+    await expect(operation).resolves.toMatchObject({ text: 'Finished' });
+    await Promise.all([firstCleanup, secondCleanup]);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
+  test('retains failed cleanup state so release can be retried', async () => {
+    const cleanup = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('release failed'))
+      .mockResolvedValueOnce(undefined);
+    const provider = new ONNXGutenyeProvider();
+    (provider as any).initialized = true;
+    (provider as any).ocrInstance = { detect: vi.fn(), cleanup };
+
+    await expect(provider.cleanup()).rejects.toThrow('release failed');
+    expect((provider as any).ocrInstance).not.toBeNull();
+    await expect(provider.performOCR([{ data: pngBuffer }])).rejects.toThrow(
+      'cleanup must succeed',
+    );
+
+    await expect(provider.cleanup()).resolves.toBeUndefined();
+    expect(cleanup).toHaveBeenCalledTimes(2);
+    expect((provider as any).ocrInstance).toBeNull();
   });
 });

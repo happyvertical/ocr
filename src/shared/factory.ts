@@ -225,7 +225,7 @@ export class OCRFactory {
 
       // Environment-specific providers
       if (this.environment === 'node') {
-        // ONNX provider (Node.js only for now) - using @gutenye/ocr-node
+        // ONNX provider (Node.js only) with package-owned native dependencies
         try {
           const { ONNXGutenyeProvider } = await import(
             '../node/onnx-gutenye.js'

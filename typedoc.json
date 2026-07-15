@@ -2,7 +2,7 @@
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/index.ts"],
   "out": "docs/api",
-  "plugin": ["typedoc-plugin-markdown"],
+  "plugin": ["typedoc-plugin-markdown", "./scripts/typedoc-source-links.mjs"],
   "name": "@happyvertical/ocr",
   "readme": "none",
   "gitRevision": "main",

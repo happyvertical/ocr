@@ -58,6 +58,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Validate dependency graph
+        run: pnpm deps:check
+
       - name: Build
         run: pnpm build
 

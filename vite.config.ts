@@ -50,9 +50,10 @@ export default defineConfig({
 
         // External dependencies - don't bundle these
         'tesseract.js',
-        '@gutenye/ocr-node',
-        'pngjs',
-        'jpeg-js',
+        /^@gutenye\/ocr-(common|models)/,
+        'onnxruntime-common',
+        'onnxruntime-node',
+        'sharp',
 
         // SDK dependencies
         '@happyvertical/utils',
