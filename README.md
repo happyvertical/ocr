@@ -43,7 +43,7 @@ yarn add @happyvertical/ocr
 bun add @happyvertical/ocr
 ```
 
-The package includes Tesseract.js by default, ONNX provider support through `@gutenye/ocr-node`, LLM-backed OCR through `@happyvertical/ai`, and a Node.js provider for Baidu Unlimited-OCR when you run it behind SGLang or Bifrost.
+The package includes Tesseract.js by default, a PaddleOCR ONNX provider with package-owned Sharp 0.35 and ONNX Runtime dependencies, LLM-backed OCR through `@happyvertical/ai`, and a Node.js provider for Baidu Unlimited-OCR when you run it behind SGLang or Bifrost. PaddleOCR model assets continue to load from `@gutenye/ocr-models`; no model binaries are checked into this repository.
 
 ## Quick Start
 
@@ -479,6 +479,7 @@ Common local quality checks:
 pnpm lint
 pnpm typecheck
 pnpm build
+pnpm deps:check
 pnpm docs:api
 pnpm docs:api:check
 pnpm test:coverage

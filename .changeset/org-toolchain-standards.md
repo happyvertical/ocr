@@ -2,4 +2,4 @@
 "@happyvertical/ocr": patch
 ---
 
-Apply org toolchain standards: pnpm 11.13.0, typescript 5.9.3 (pinned), vitest 4.1.10, vite 8.1.4, biome 2.5.3, lefthook 2.1.10. Migrate vitest config off the removed `poolOptions` and rebuild dist under vite 8. No public API changes.
+Apply org toolchain standards: pnpm 11.13.0, TypeScript 6.0.3, Vitest 4.1.10, Vite 8.1.4, Biome 2.5.4, and Lefthook 2.1.10. Migrate the Vitest config off the removed `poolOptions` setting. No public API changes.
