@@ -5,12 +5,47 @@ import { promisify } from 'node:util';
 import { describe, expect, test } from 'vitest';
 
 const execFileAsync = promisify(execFile);
-const kreuzbergSupported =
+const glibcVersion =
+  process.platform === 'linux'
+    ? process.report.getReport().header.glibcVersionRuntime
+    : undefined;
+const [glibcMajor = 0, glibcMinor = 0] = (glibcVersion ?? '')
+  .split('.')
+  .map(Number);
+const declaredKreuzbergTuple =
   (process.platform === 'darwin' && process.arch === 'arm64') ||
   (process.platform === 'win32' && process.arch === 'x64') ||
   (process.platform === 'linux' &&
     (process.arch === 'arm64' || process.arch === 'x64') &&
-    Boolean(process.report.getReport().header.glibcVersionRuntime));
+    Boolean(glibcVersion));
+const incompatibleLinuxABI =
+  process.platform === 'linux' &&
+  Boolean(glibcVersion) &&
+  (glibcMajor < 2 || (glibcMajor === 2 && glibcMinor < 39));
+
+async function canLoadKreuzberg(): Promise<boolean> {
+  try {
+    await execFileAsync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '--eval',
+        "const kreuzberg = await import('@kreuzberg/node'); kreuzberg.listOcrBackends();",
+      ],
+      { cwd: process.cwd(), timeout: 30_000 },
+    );
+    return true;
+  } catch {
+    if (declaredKreuzbergTuple && !incompatibleLinuxABI) {
+      throw new Error(
+        `Kreuzberg native bindings must load on ${process.platform}-${process.arch}`,
+      );
+    }
+    return false;
+  }
+}
+
+const kreuzbergAvailable = await canLoadKreuzberg();
 
 async function exerciseNativeConsumer(entrypoint: string) {
   const source = `
@@ -99,7 +134,7 @@ function assertNativeCoexistence(
 }
 
 describe('native consumer coexistence', () => {
-  test.skipIf(!kreuzbergSupported)(
+  test.skipIf(!kreuzbergAvailable)(
     'keeps discovery isolated and performs OCR beside Kreuzberg and Sharp',
     async () => {
       assertNativeCoexistence(
@@ -108,7 +143,7 @@ describe('native consumer coexistence', () => {
     },
   );
 
-  test.skipIf(!kreuzbergSupported || !existsSync(resolve('dist/index.js')))(
+  test.skipIf(!kreuzbergAvailable || !existsSync(resolve('dist/index.js')))(
     'preserves native coexistence in the built package',
     async () => {
       assertNativeCoexistence(
