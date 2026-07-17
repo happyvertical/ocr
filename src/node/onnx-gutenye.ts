@@ -3,6 +3,8 @@
  * package-owned Sharp and ONNX Runtime backend.
  */
 
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import type {
   DependencyCheckResult,
   OCRCapabilities,
@@ -12,13 +14,152 @@ import type {
   OCRResult,
 } from '../shared/types';
 import { OCRDependencyError } from '../shared/types';
-import {
-  createGutenyeOCR,
-  type GutenyeDetection,
-  type GutenyeImageInput,
-  type GutenyeOCR,
-  nativeDependencyVersions,
+import type {
+  GutenyeDetection,
+  GutenyeImageInput,
+  GutenyeOCR,
 } from './gutenye-runtime';
+
+type NativeRuntime = typeof import('./gutenye-runtime');
+
+const execFileAsync = promisify(execFile);
+const runtimeDependencies = [
+  ['sharp', 'sharp'],
+  ['onnxruntime-node', 'onnxruntime-node'],
+  ['gutenye-ocr-common', '@gutenye/ocr-common'],
+  ['gutenye-split-into-line-images', '@gutenye/ocr-common/splitIntoLineImages'],
+  ['gutenye-ocr-models', '@gutenye/ocr-models/node'],
+] as const;
+
+let nativeRuntimePromise: Promise<NativeRuntime> | null = null;
+let nativeDependencyCheckPromise: Promise<DependencyCheckResult> | null = null;
+
+function loadNativeRuntime(): Promise<NativeRuntime> {
+  if (!nativeRuntimePromise) {
+    nativeRuntimePromise = import('./gutenye-runtime.js');
+  }
+  return nativeRuntimePromise;
+}
+
+async function checkNativeDependencies(): Promise<DependencyCheckResult> {
+  const details: Record<string, boolean> = {};
+  const resolvedDependencies: Array<[string, string]> = [];
+
+  for (const [name, specifier] of runtimeDependencies) {
+    details[name] = false;
+    try {
+      resolvedDependencies.push([name, import.meta.resolve(specifier)]);
+    } catch {
+      details[name] = false;
+    }
+  }
+
+  if (resolvedDependencies.length !== runtimeDependencies.length) {
+    return {
+      available: false,
+      details,
+      error: 'Native PaddleOCR dependencies are not installed',
+    };
+  }
+
+  const validationScript = `
+    const { constants } = await import('node:fs');
+    const { access, stat } = await import('node:fs/promises');
+    const { dirname, resolve } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const dependencies = JSON.parse(process.argv[1]);
+    const results = {};
+    for (const [name, url] of dependencies) {
+      try {
+        const loaded = await import(url);
+        if (name === 'gutenye-ocr-common') {
+          if (
+            typeof loaded.default?.create !== 'function' ||
+            typeof loaded.FileUtilsBase !== 'function' ||
+            typeof loaded.ImageRawBase !== 'function' ||
+            typeof loaded.registerBackend !== 'function'
+          ) throw new Error('Gutenye common exports are incomplete');
+        }
+        if (
+          name === 'gutenye-split-into-line-images' &&
+          typeof loaded.splitIntoLineImages !== 'function'
+        ) throw new Error('Gutenye line splitting export is unavailable');
+        if (name === 'gutenye-ocr-models') {
+          const paths = loaded.default;
+          if (
+            typeof paths?.detectionPath !== 'string' ||
+            typeof paths?.recognitionPath !== 'string' ||
+            typeof paths?.dictionaryPath !== 'string'
+          ) throw new Error('Gutenye model exports are incomplete');
+          const modelsDirectory = dirname(fileURLToPath(url));
+          const runtimePaths = [
+            resolve(modelsDirectory, 'assets/ch_PP-OCRv4_det_infer.onnx'),
+            resolve(modelsDirectory, 'assets/ch_PP-OCRv4_rec_infer.onnx'),
+            resolve(modelsDirectory, 'assets/ppocr_keys_v1.txt'),
+          ];
+          for (const path of [
+            paths.detectionPath,
+            paths.recognitionPath,
+            paths.dictionaryPath,
+            ...runtimePaths,
+          ]) {
+            await access(path, constants.R_OK);
+            if (!(await stat(path)).isFile()) {
+              throw new Error('Gutenye model asset is not a regular file');
+            }
+          }
+        }
+        const version = name === 'sharp'
+          ? loaded.default?.versions?.sharp
+          : loaded.env?.versions?.node;
+        results[name] = { available: true, version };
+      } catch {
+        results[name] = { available: false };
+      }
+    }
+    process.stdout.write(JSON.stringify(results));
+  `;
+
+  const versions: Record<string, string | undefined> = {};
+  try {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '--eval',
+        validationScript,
+        JSON.stringify(resolvedDependencies),
+      ],
+      { timeout: 30_000, windowsHide: true },
+    );
+    const results = JSON.parse(stdout) as Record<
+      string,
+      { available: boolean; version?: string }
+    >;
+    for (const [name] of runtimeDependencies) {
+      details[name] = results[name]?.available ?? false;
+      versions[name] = results[name]?.version;
+    }
+  } catch {
+    return {
+      available: false,
+      details,
+      error: 'Native PaddleOCR dependencies failed to load',
+    };
+  }
+
+  const available = runtimeDependencies.every(([name]) => details[name]);
+  return {
+    available,
+    details,
+    error: available
+      ? undefined
+      : 'Native PaddleOCR dependencies failed to load',
+    version: available
+      ? `Sharp ${versions.sharp}, ONNX Runtime ${versions['onnxruntime-node']}`
+      : undefined,
+  };
+}
 
 /** ONNX PaddleOCR provider backed by Sharp and ONNX Runtime on Node.js. */
 export class ONNXGutenyeProvider implements OCRProvider {
@@ -34,7 +175,8 @@ export class ONNXGutenyeProvider implements OCRProvider {
     if (this.initialized) return;
 
     if (!this.initializationPromise) {
-      const initialization = createGutenyeOCR()
+      const initialization = loadNativeRuntime()
+        .then(({ createGutenyeOCR }) => createGutenyeOCR())
         .then((ocr) => {
           this.ocrInstance = ocr;
           this.initialized = true;
@@ -161,17 +303,11 @@ export class ONNXGutenyeProvider implements OCRProvider {
   }
 
   async checkDependencies(): Promise<DependencyCheckResult> {
-    return {
-      available: Boolean(
-        nativeDependencyVersions.sharp && nativeDependencyVersions.onnxRuntime,
-      ),
-      details: {
-        sharp: Boolean(nativeDependencyVersions.sharp),
-        'onnxruntime-node': Boolean(nativeDependencyVersions.onnxRuntime),
-        'gutenye-ocr-common': true,
-      },
-      version: `Sharp ${nativeDependencyVersions.sharp}, ONNX Runtime ${nativeDependencyVersions.onnxRuntime}`,
-    };
+    if (!nativeDependencyCheckPromise) {
+      nativeDependencyCheckPromise = checkNativeDependencies();
+    }
+    const result = await nativeDependencyCheckPromise;
+    return { ...result, details: { ...result.details } };
   }
 
   async checkCapabilities(): Promise<OCRCapabilities> {
