@@ -139,6 +139,19 @@ describe('ONNXGutenyeProvider', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
+  test('validates every native and Gutenye runtime dependency', async () => {
+    const dependencies = await new ONNXGutenyeProvider().checkDependencies();
+
+    expect(dependencies.available).toBe(true);
+    expect(dependencies.details).toEqual({
+      sharp: true,
+      'onnxruntime-node': true,
+      'gutenye-ocr-common': true,
+      'gutenye-split-into-line-images': true,
+      'gutenye-ocr-models': true,
+    });
+  });
+
   test('processes raw RGB data and filters detections by confidence', async () => {
     const detect = vi.fn().mockResolvedValue([
       {
