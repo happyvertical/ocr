@@ -52,13 +52,6 @@ async function exerciseNativeConsumer(entrypoint: string) {
       import { readFile } from 'node:fs/promises';
       import { pathToFileURL } from 'node:url';
 
-      const nativeAddons = [];
-      const originalDlopen = process.dlopen;
-      process.dlopen = function trackedDlopen(module, filename, flags) {
-        nativeAddons.push(String(filename));
-        return originalDlopen.call(this, module, filename, flags);
-      };
-
       const kreuzberg = await import('@kreuzberg/node');
       kreuzberg.listOcrBackends();
       await import('sharp');
@@ -67,7 +60,7 @@ async function exerciseNativeConsumer(entrypoint: string) {
       const { getAvailableProviders, getProviderInfo, OCRFactory } = await import(entrypoint);
       const providers = await getAvailableProviders();
       const onnxInfo = await getProviderInfo('onnx');
-      const discoveryAddons = [...nativeAddons];
+      const discoveryAddons = process.report.getReport().sharedObjects;
 
       const factory = new OCRFactory({ provider: 'onnx' });
       const image = await readFile(process.argv[2]);
@@ -76,29 +69,36 @@ async function exerciseNativeConsumer(entrypoint: string) {
 
       console.log(JSON.stringify({
         discoveryAddons,
-        nativeAddons,
+        nativeAddons: process.report.getReport().sharedObjects,
         ocrText: ocrResult.text,
         onnxInfo,
         providers,
       }));
     `;
-  const { stdout } = await execFileAsync(
-    process.execPath,
-    [
-      '--import',
-      'tsx',
-      '--input-type=module',
-      '--eval',
-      source,
-      entrypoint,
-      resolve('test/test.png'),
-    ],
-    {
-      cwd: process.cwd(),
-      maxBuffer: 1024 * 1024,
-      timeout: 120_000,
-    },
-  );
+  let stdout: string;
+  try {
+    ({ stdout } = await execFileAsync(
+      process.execPath,
+      [
+        '--import',
+        'tsx',
+        '--input-type=module',
+        '--eval',
+        source,
+        entrypoint,
+        resolve('test/test.png'),
+      ],
+      {
+        cwd: process.cwd(),
+        maxBuffer: 1024 * 1024,
+        timeout: 120_000,
+      },
+    ));
+  } catch {
+    throw new Error(
+      `Native consumer must support OCR discovery and execution on ${process.platform}-${process.arch}`,
+    );
+  }
   return JSON.parse(stdout.trim()) as {
     discoveryAddons: string[];
     nativeAddons: string[];
@@ -135,7 +135,7 @@ function assertNativeCoexistence(
 
 describe('native consumer coexistence', () => {
   test.skipIf(!kreuzbergAvailable)(
-    'keeps discovery isolated and performs OCR beside Kreuzberg and Sharp',
+    'keeps discovery isolated while preserving OCR functionality',
     async () => {
       assertNativeCoexistence(
         await exerciseNativeConsumer(resolve('src/index.ts')),
