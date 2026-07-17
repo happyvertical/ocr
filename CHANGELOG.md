@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.61.2
+
+### Patch Changes
+
+- c75c89c: Defer loading the Sharp and ONNX Runtime native addons until the ONNX provider performs OCR, preventing provider discovery from destabilizing consumers that also load Kreuzberg or other native runtimes.
+
 ## 0.61.1
 
 ### Patch Changes
