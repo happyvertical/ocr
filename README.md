@@ -473,6 +473,9 @@ When implementing a custom provider:
 
 ## Development
 
+Lifecycle-protected pull requests merge through the managed merge queue so the
+synthetic merge revision is revalidated before it reaches `main`.
+
 Common local quality checks:
 
 ```bash
