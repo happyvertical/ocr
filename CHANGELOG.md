@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.61.3
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - migrate generation 5 lifecycle (#120) (ocr)
+
 ## 0.61.2
 
 ### Patch Changes
