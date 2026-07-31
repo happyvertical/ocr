@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.61.4
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - sync generation-21 agent policy kernel (#133)
+
 ## 0.61.3
 
 ### Patch Changes
