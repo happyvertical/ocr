@@ -6,7 +6,7 @@
 
 # Class: OCRFactory
 
-Defined in: [src/shared/factory.ts:100](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L100)
+Defined in: [src/shared/factory.ts:113](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L113)
 
 Main factory class for managing OCR providers with intelligent selection and fallback.
 
@@ -65,7 +65,7 @@ if (result.detections) {
 
 > **new OCRFactory**(`options?`): `OCRFactory`
 
-Defined in: [src/shared/factory.ts:147](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L147)
+Defined in: [src/shared/factory.ts:160](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L160)
 
 Create a new OCR factory instance.
 
@@ -125,7 +125,7 @@ const factory = new OCRFactory(); // Uses env vars
 
 > **getBestProvider**(): `Promise`\<[`OCRProvider`](../interfaces/OCRProvider.md) \| `null`\>
 
-Defined in: [src/shared/factory.ts:303](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L303)
+Defined in: [src/shared/factory.ts:314](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L314)
 
 Get the best available OCR provider for the current environment.
 
@@ -158,7 +158,7 @@ if (provider) {
 
 > **performOCR**(`images`, `options?`): `Promise`\<[`OCRResult`](../interfaces/OCRResult.md)\>
 
-Defined in: [src/shared/factory.ts:450](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L450)
+Defined in: [src/shared/factory.ts:461](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L461)
 
 Perform OCR processing on one or more images.
 
@@ -245,7 +245,7 @@ try {
 
 > **getProvidersInfo**(): `Promise`\<[`OCRProviderInfo`](../interfaces/OCRProviderInfo.md)[]\>
 
-Defined in: [src/shared/factory.ts:546](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L546)
+Defined in: [src/shared/factory.ts:557](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L557)
 
 Get detailed information about all OCR providers.
 
@@ -280,7 +280,7 @@ providers.forEach(provider => {
 
 > **isOCRAvailable**(): `Promise`\<`boolean`\>
 
-Defined in: [src/shared/factory.ts:598](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L598)
+Defined in: [src/shared/factory.ts:609](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L609)
 
 Check if OCR functionality is available in the current environment.
 
@@ -309,7 +309,7 @@ if (await factory.isOCRAvailable()) {
 
 > **getSupportedLanguages**(): `Promise`\<`string`[]\>
 
-Defined in: [src/shared/factory.ts:623](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L623)
+Defined in: [src/shared/factory.ts:634](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L634)
 
 Get array of supported language codes from the best available provider.
 
@@ -341,7 +341,7 @@ const result = await factory.performOCR(images, {
 
 > **cleanup**(): `Promise`\<`void`\>
 
-Defined in: [src/shared/factory.ts:660](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L660)
+Defined in: [src/shared/factory.ts:671](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L671)
 
 Clean up all OCR providers and release their resources.
 
@@ -382,7 +382,7 @@ process.on('SIGINT', async () => {
 
 > **addProvider**(`name`, `provider`): `void`
 
-Defined in: [src/shared/factory.ts:698](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L698)
+Defined in: [src/shared/factory.ts:709](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L709)
 
 Add a custom OCR provider to the factory.
 
@@ -429,7 +429,7 @@ const customFactory = new OCRFactory({ provider: 'custom' });
 
 > **removeProvider**(`name`): `Promise`\<`void`\>
 
-Defined in: [src/shared/factory.ts:716](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L716)
+Defined in: [src/shared/factory.ts:727](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L727)
 
 Remove an OCR provider from the factory.
 
@@ -461,7 +461,7 @@ await factory.removeProvider('custom');
 
 > **getAvailableProviderNames**(): `string`[]
 
-Defined in: [src/shared/factory.ts:741](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L741)
+Defined in: [src/shared/factory.ts:752](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L752)
 
 Get array of provider names that have been loaded in the current environment.
 
@@ -490,7 +490,7 @@ console.log('Loaded providers:', providerNames);
 
 > **getEnvironment**(): [`OCREnvironment`](../type-aliases/OCREnvironment.md)
 
-Defined in: [src/shared/factory.ts:760](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L760)
+Defined in: [src/shared/factory.ts:771](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L771)
 
 Get the detected runtime environment.
 

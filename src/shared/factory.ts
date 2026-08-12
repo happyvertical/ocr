@@ -50,6 +50,19 @@ function detectEnvironment(): OCREnvironment {
   return 'unknown';
 }
 
+type NodeOCRModule = typeof import('../node/index');
+
+/**
+ * Load the native provider through its package subpath without exposing that
+ * dependency graph to browser/SSR bundlers.
+ */
+function loadNodeOCRModule(): Promise<NodeOCRModule> {
+  // Keep the bare subpath opaque to Rolldown. A literal import expression is
+  // statically expanded and pulls the native dependency graph into browsers.
+  const specifier = ['@happyvertical', 'ocr', 'node'].join('/');
+  return import(/* @vite-ignore */ specifier) as Promise<NodeOCRModule>;
+}
+
 /**
  * Main factory class for managing OCR providers with intelligent selection and fallback.
  *
@@ -227,9 +240,7 @@ export class OCRFactory {
       if (this.environment === 'node') {
         // ONNX provider (Node.js only) with package-owned native dependencies
         try {
-          const { ONNXGutenyeProvider } = await import(
-            '../node/onnx-gutenye.js'
-          );
+          const { ONNXGutenyeProvider } = await loadNodeOCRModule();
           this.providers.set('onnx', new ONNXGutenyeProvider());
         } catch {
           // Ignore if ONNX provider fails to load
