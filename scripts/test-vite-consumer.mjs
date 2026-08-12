@@ -36,18 +36,19 @@ try {
           '@happyvertical/ocr': `file:${tarball}`,
           vite: '8.1.4',
         },
-        pnpm: {
-          overrides: {
-            '@gutenye/ocr-common': '1.4.8',
-            '@gutenye/ocr-models': '1.4.2',
-            '@happyvertical/ai': '0.80.0',
-            '@happyvertical/utils': '0.80.0',
-          },
-        },
       },
       null,
       2,
     ),
+  );
+  await writeFile(
+    join(consumer, 'pnpm-workspace.yaml'),
+    `overrides:
+  '@gutenye/ocr-common': 1.4.8
+  '@gutenye/ocr-models': 1.4.2
+  '@happyvertical/ai': 0.80.0
+  '@happyvertical/utils': 0.80.0
+`,
   );
   await writeFile(
     join(consumer, 'index.html'),
