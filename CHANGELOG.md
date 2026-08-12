@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.61.5
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - isolate native OCR behind Node package boundary (#135)
+
 ## 0.61.4
 
 ### Patch Changes
