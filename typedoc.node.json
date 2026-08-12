@@ -1,0 +1,25 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/node/index.ts"],
+  "out": "docs/api/node",
+  "plugin": ["typedoc-plugin-markdown", "./scripts/typedoc-source-links.mjs"],
+  "name": "@happyvertical/ocr/node",
+  "readme": "none",
+  "gitRevision": "main",
+  "cleanOutputDir": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "treatWarningsAsErrors": true,
+  "treatValidationWarningsAsErrors": true,
+  "requiredToBeDocumented": ["Class", "Interface", "Function", "TypeAlias"],
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": true,
+    "notExported": false,
+    "rewrittenLink": true
+  },
+  "hideGenerator": true,
+  "sourceLinkExternal": true,
+  "sort": ["source-order"]
+}

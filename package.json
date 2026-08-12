@@ -96,7 +96,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check src/",
     "format": "biome format --write src/",
-    "docs:api": "typedoc --options typedoc.json",
+    "docs:api": "typedoc --options typedoc.json && typedoc --options typedoc.node.json",
     "docs:api:check": "sh -c 'before=$(git status --porcelain -- docs/api); pnpm docs:api; after=$(git status --porcelain -- docs/api); test \"$before\" = \"$after\"'",
     "clean": "rm -rf dist *.tsbuildinfo",
     "dev": "npm run build:watch & npm run test:watch",
