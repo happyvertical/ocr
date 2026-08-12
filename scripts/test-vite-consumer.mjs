@@ -61,7 +61,7 @@ try {
 
   await execFileAsync(
     'pnpm',
-    ['install', '--offline', '--ignore-scripts', '--no-frozen-lockfile'],
+    ['install', '--prefer-offline', '--ignore-scripts', '--no-frozen-lockfile'],
     { cwd: consumer, encoding: 'utf8' },
   );
   await execFileAsync('pnpm', ['exec', 'vite', 'build'], {
