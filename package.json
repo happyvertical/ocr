@@ -40,6 +40,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/node.js",
+      "types": "./dist/node/index.d.ts"
     }
   },
   "description": "Node-first OCR interface with support for Tesseract.js, ONNX (PaddleOCR), HappyVertical AI-backed vision OCR, and Unlimited-OCR",
@@ -82,8 +86,9 @@
   "homepage": "https://github.com/happyvertical/ocr#readme",
   "license": "MIT",
   "scripts": {
-    "test": "vitest run --testTimeout 120000",
-    "test:coverage": "vitest run --coverage --testTimeout 120000",
+    "test": "pnpm build && vitest run --testTimeout 120000 && pnpm test:vite-consumer",
+    "test:coverage": "pnpm build && vitest run --coverage --testTimeout 120000 && pnpm test:vite-consumer",
+    "test:vite-consumer": "node scripts/test-vite-consumer.mjs",
     "test:watch": "vitest --testTimeout 120000",
     "build": "vite build",
     "build:watch": "vite build --watch",
@@ -91,7 +96,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check src/",
     "format": "biome format --write src/",
-    "docs:api": "typedoc --options typedoc.json",
+    "docs:api": "typedoc --options typedoc.json && typedoc --options typedoc.node.json",
     "docs:api:check": "sh -c 'before=$(git status --porcelain -- docs/api); pnpm docs:api; after=$(git status --porcelain -- docs/api); test \"$before\" = \"$after\"'",
     "clean": "rm -rf dist *.tsbuildinfo",
     "dev": "npm run build:watch & npm run test:watch",
