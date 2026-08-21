@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.61.6
+
+### Patch Changes
+
+- ### Dependencies
+
+  - migrate OCR smoke workflow to generation 24 (#137)
+
 ## 0.61.5
 
 ### Patch Changes
