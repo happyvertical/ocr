@@ -6,7 +6,7 @@
 
 # Interface: UnlimitedOCRProviderConfig
 
-Defined in: [src/node/unlimited-ocr.ts:55](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L55)
+Defined in: [src/node/unlimited-ocr.ts:56](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L56)
 
 Configuration for the served Unlimited-OCR provider.
 
@@ -16,7 +16,7 @@ Configuration for the served Unlimited-OCR provider.
 
 > `optional` **baseUrl?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:57](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L57)
+Defined in: [src/node/unlimited-ocr.ts:58](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L58)
 
 Direct SGLang/vLLM URL or Bifrost gateway URL.
 
@@ -26,7 +26,7 @@ Direct SGLang/vLLM URL or Bifrost gateway URL.
 
 > `optional` **apiKey?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:59](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L59)
+Defined in: [src/node/unlimited-ocr.ts:60](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L60)
 
 Optional API key. Required for HappyVertical Bifrost virtual-key auth.
 
@@ -36,7 +36,7 @@ Optional API key. Required for HappyVertical Bifrost virtual-key auth.
 
 > `optional` **model?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:61](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L61)
+Defined in: [src/node/unlimited-ocr.ts:62](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L62)
 
 Served model name. The upstream SGLang example uses `Unlimited-OCR`.
 
@@ -46,7 +46,7 @@ Served model name. The upstream SGLang example uses `Unlimited-OCR`.
 
 > `optional` **transport?**: [`UnlimitedOCRTransport`](../type-aliases/UnlimitedOCRTransport.md)
 
-Defined in: [src/node/unlimited-ocr.ts:63](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L63)
+Defined in: [src/node/unlimited-ocr.ts:64](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L64)
 
 Whether the endpoint is direct or Bifrost-routed.
 
@@ -56,7 +56,7 @@ Whether the endpoint is direct or Bifrost-routed.
 
 > `optional` **backend?**: [`UnlimitedOCRBackend`](../type-aliases/UnlimitedOCRBackend.md)
 
-Defined in: [src/node/unlimited-ocr.ts:68](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L68)
+Defined in: [src/node/unlimited-ocr.ts:69](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L69)
 
 Inference server behind the endpoint. Defaults to `sglang`; set `vllm`
 (or `HAVE_OCR_UNLIMITED_BACKEND=vllm`) for the vLLM recipe.
@@ -67,7 +67,7 @@ Inference server behind the endpoint. Defaults to `sglang`; set `vllm`
 
 > `optional` **imageMode?**: [`UnlimitedOCRImageMode`](../type-aliases/UnlimitedOCRImageMode.md)
 
-Defined in: [src/node/unlimited-ocr.ts:73](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L73)
+Defined in: [src/node/unlimited-ocr.ts:74](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L74)
 
 Image mode sent to Unlimited-OCR. `auto` uses `gundam` for one image and
 `base` for multi-page. Ignored by the `vllm` backend.
@@ -78,10 +78,10 @@ Image mode sent to Unlimited-OCR. `auto` uses `gundam` for one image and
 
 > `optional` **prompt?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:78](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L78)
+Defined in: [src/node/unlimited-ocr.ts:79](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L79)
 
-Prompt for a single image. Defaults to `document parsing.`; the `vllm`
-backend prefixes `<image>` when the prompt does not already start with it.
+Prompt for a single image. Defaults to `document parsing.`. See
+`multiPagePrompt` for how the `vllm` backend places `<image>` placeholders.
 
 ***
 
@@ -89,11 +89,14 @@ backend prefixes `<image>` when the prompt does not already start with it.
 
 > `optional` **multiPagePrompt?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:84](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L84)
+Defined in: [src/node/unlimited-ocr.ts:88](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L88)
 
-Prompt for multiple images/pages. Defaults to `Multi page parsing.`; the
-`vllm` backend prefixes `<image>` when the prompt does not already start
-with it.
+Prompt for multiple images/pages. Defaults to `Multi page parsing.`.
+
+The `vllm` backend needs exactly one `<image>` placeholder per image sent.
+A prompt that already contains as many placeholders as the request has
+images is sent unchanged; otherwise every `<image>` is removed and one
+placeholder per image is prefixed (`<image><image>Multi page parsing.`).
 
 ***
 
@@ -101,7 +104,7 @@ with it.
 
 > `optional` **stream?**: `boolean`
 
-Defined in: [src/node/unlimited-ocr.ts:86](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L86)
+Defined in: [src/node/unlimited-ocr.ts:90](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L90)
 
 Whether to request streaming (server-sent events) responses.
 
@@ -111,7 +114,7 @@ Whether to request streaming (server-sent events) responses.
 
 > `optional` **timeout?**: `number`
 
-Defined in: [src/node/unlimited-ocr.ts:88](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L88)
+Defined in: [src/node/unlimited-ocr.ts:92](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L92)
 
 Request timeout in milliseconds.
 
@@ -121,7 +124,7 @@ Request timeout in milliseconds.
 
 > `optional` **ngramSize?**: `number`
 
-Defined in: [src/node/unlimited-ocr.ts:90](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L90)
+Defined in: [src/node/unlimited-ocr.ts:94](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L94)
 
 No-repeat ngram size (`custom_params` on SGLang, `vllm_xargs` on vLLM).
 
@@ -131,7 +134,7 @@ No-repeat ngram size (`custom_params` on SGLang, `vllm_xargs` on vLLM).
 
 > `optional` **ngramWindow?**: `number`
 
-Defined in: [src/node/unlimited-ocr.ts:92](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L92)
+Defined in: [src/node/unlimited-ocr.ts:96](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L96)
 
 Override no-repeat ngram window for all requests.
 
@@ -141,7 +144,7 @@ Override no-repeat ngram window for all requests.
 
 > `optional` **singleImageNgramWindow?**: `number`
 
-Defined in: [src/node/unlimited-ocr.ts:94](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L94)
+Defined in: [src/node/unlimited-ocr.ts:98](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L98)
 
 Window used for one-image `gundam` mode when ngramWindow is not set.
 
@@ -151,7 +154,7 @@ Window used for one-image `gundam` mode when ngramWindow is not set.
 
 > `optional` **multiImageNgramWindow?**: `number`
 
-Defined in: [src/node/unlimited-ocr.ts:96](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L96)
+Defined in: [src/node/unlimited-ocr.ts:100](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L100)
 
 Window used for multi-image `base` mode when ngramWindow is not set.
 
@@ -161,7 +164,7 @@ Window used for multi-image `base` mode when ngramWindow is not set.
 
 > `optional` **customLogitProcessor?**: `string`
 
-Defined in: [src/node/unlimited-ocr.ts:104](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L104)
+Defined in: [src/node/unlimited-ocr.ts:108](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L108)
 
 SGLang custom logit processor string. Ignored by the `vllm` backend,
 which enables its n-gram logits processor server-side.
@@ -175,6 +178,6 @@ The upstream Python example uses:
 
 > `optional` **extraRequestBody?**: `Record`\<`string`, `unknown`\>
 
-Defined in: [src/node/unlimited-ocr.ts:106](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L106)
+Defined in: [src/node/unlimited-ocr.ts:110](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L110)
 
 Extra request body fields merged into the chat completions payload last.

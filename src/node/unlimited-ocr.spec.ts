@@ -416,7 +416,7 @@ describe('UnlimitedOCRProvider', () => {
       expect(content).toHaveLength(3);
       expect(content[0]).toEqual({
         type: 'text',
-        text: '<image>Multi page parsing. Preferred OCR language(s): eng.',
+        text: '<image><image>Multi page parsing. Preferred OCR language(s): eng.',
       });
       expect(result.metadata?.imageMode).toBe('base');
     });
@@ -454,6 +454,89 @@ describe('UnlimitedOCRProvider', () => {
       await provider.performOCR([{ data: pngBuffer() }]);
 
       expect(contentOf(bodies[0])[0].text).toBe('<image>document parsing.');
+    });
+
+    test.each([
+      [1, '<image>document parsing.'],
+      [2, '<image><image>Multi page parsing.'],
+      [3, '<image><image><image>Multi page parsing.'],
+    ])(
+      'sends one <image> placeholder per image for %i image(s)',
+      async (count, text) => {
+        const bodies = captureBody();
+        const provider = new UnlimitedOCRProvider({
+          baseUrl: 'http://127.0.0.1:8000',
+          backend: 'vllm',
+          stream: false,
+        });
+
+        await provider.performOCR(
+          Array.from({ length: count }, () => ({ data: pngBuffer() })),
+        );
+
+        const content = contentOf(bodies[0]);
+        expect(content[0]).toEqual({ type: 'text', text });
+        expect(
+          content.filter((part) => part.type === 'image_url'),
+        ).toHaveLength(count);
+      },
+    );
+
+    test('counts placeholders after dropping invalid images', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        stream: false,
+      });
+
+      await provider.performOCR([
+        { data: pngBuffer() },
+        { data: Buffer.from([1, 2, 3]) },
+        { data: pngBuffer() },
+      ]);
+
+      const content = contentOf(bodies[0]);
+      expect(content[0].text).toBe('<image><image>Multi page parsing.');
+      expect(content).toHaveLength(3);
+      warn.mockRestore();
+    });
+
+    test('keeps a configured prompt whose placeholders match the image count', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        multiPagePrompt: '<image>\n<image>\nMulti page parsing.',
+        stream: false,
+      });
+
+      await provider.performOCR([{ data: pngBuffer() }, { data: pngBuffer() }]);
+
+      expect(contentOf(bodies[0])[0].text).toBe(
+        '<image>\n<image>\nMulti page parsing.',
+      );
+    });
+
+    test('rewrites a configured prompt whose placeholders do not match', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        multiPagePrompt: '<image>Multi page parsing.',
+        stream: false,
+      });
+
+      await provider.performOCR([
+        { data: pngBuffer() },
+        { data: pngBuffer() },
+        { data: pngBuffer() },
+      ]);
+
+      expect(contentOf(bodies[0])[0].text).toBe(
+        '<image><image><image>Multi page parsing.',
+      );
     });
 
     test('lets extraRequestBody override vllm_xargs last', async () => {

@@ -167,11 +167,11 @@ The two servers expect different request fields, so set the backend to match the
 | | `vllm` | `sglang` (default) |
 | --- | --- | --- |
 | N-gram logits-processor args | `vllm_xargs: { ngram_size, window_size }` | `custom_params: { ngram_size, window_size }` |
-| Default prompts | `<image>document parsing.` / `<image>Multi page parsing.` (configured prompts get the `<image>` prefix if they lack it) | `document parsing.` / `Multi page parsing.` |
+| Prompt | one `<image>` per image sent, then the prompt: `<image>document parsing.`, `<image><image>Multi page parsing.` for two pages (see below) | `document parsing.` / `Multi page parsing.` |
 | Image mode | chosen by the server | `images_config.image_mode` (`HAVE_OCR_UNLIMITED_IMAGE_MODE`) |
 | `custom_logit_processor` | not sent (the processor is enabled server-side) | sent when configured |
 
-Both backends send `skip_special_tokens: false`, put the text part before the image parts, and use an n-gram window of 128 for one image and 1024 for multi-image/multi-page requests (`HAVE_OCR_UNLIMITED_SINGLE_IMAGE_NGRAM_WINDOW`, `HAVE_OCR_UNLIMITED_MULTI_IMAGE_NGRAM_WINDOW`, or `HAVE_OCR_UNLIMITED_NGRAM_WINDOW` for all requests; `HAVE_OCR_UNLIMITED_NGRAM_SIZE` defaults to 35). vLLM ignores request fields it does not know, so a vLLM server sent the SGLang shape runs without the n-gram args, and long documents can loop on coordinate tokens.
+Both backends send `skip_special_tokens: false`, put the text part before the image parts, and use an n-gram window of 128 for one image and 1024 for multi-image/multi-page requests (`HAVE_OCR_UNLIMITED_SINGLE_IMAGE_NGRAM_WINDOW`, `HAVE_OCR_UNLIMITED_MULTI_IMAGE_NGRAM_WINDOW`, or `HAVE_OCR_UNLIMITED_NGRAM_WINDOW` for all requests; `HAVE_OCR_UNLIMITED_NGRAM_SIZE` defaults to 35). vLLM rejects a request whose `<image>` placeholder count differs from its image count, so with the `vllm` backend a configured prompt (`HAVE_OCR_UNLIMITED_PROMPT`, `HAVE_OCR_UNLIMITED_MULTI_PAGE_PROMPT`) that already holds exactly one `<image>` per image is sent unchanged; otherwise its `<image>` tokens are removed and one per image is prefixed. vLLM ignores request fields it does not know, so a vLLM server sent the SGLang shape runs without the n-gram args, and long documents can loop on coordinate tokens.
 
 When `transport` is not set explicitly, the provider stays on `direct` whenever an Unlimited-OCR base URL is supplied (`baseUrl` or `HAVE_OCR_UNLIMITED_BASE_URL`); Bifrost is inferred from Bifrost environment variables only when no direct endpoint is configured.
 

@@ -35,8 +35,9 @@ export type UnlimitedOCRTransport = 'direct' | 'bifrost';
  *   `custom_logit_processor`.
  * - `vllm` follows the vLLM recipe (https://recipes.vllm.ai/baidu/Unlimited-OCR):
  *   it sends `vllm_xargs: { ngram_size, window_size }` for the server-side
- *   `NGramPerReqLogitsProcessor`, starts the prompt with a literal `<image>`,
- *   and omits the SGLang-only `images_config` and `custom_logit_processor`
+ *   `NGramPerReqLogitsProcessor`, starts the prompt with one literal `<image>`
+ *   placeholder per image sent (vLLM rejects a request whose placeholder
+ *   count differs from its image count), and omits the SGLang-only `images_config` and `custom_logit_processor`
  *   fields (vLLM chooses the image mode itself).
  */
 export type UnlimitedOCRBackend = 'sglang' | 'vllm';
@@ -72,14 +73,17 @@ export interface UnlimitedOCRProviderConfig {
    */
   imageMode?: UnlimitedOCRImageMode;
   /**
-   * Prompt for a single image. Defaults to `document parsing.`; the `vllm`
-   * backend prefixes `<image>` when the prompt does not already start with it.
+   * Prompt for a single image. Defaults to `document parsing.`. See
+   * `multiPagePrompt` for how the `vllm` backend places `<image>` placeholders.
    */
   prompt?: string;
   /**
-   * Prompt for multiple images/pages. Defaults to `Multi page parsing.`; the
-   * `vllm` backend prefixes `<image>` when the prompt does not already start
-   * with it.
+   * Prompt for multiple images/pages. Defaults to `Multi page parsing.`.
+   *
+   * The `vllm` backend needs exactly one `<image>` placeholder per image sent.
+   * A prompt that already contains as many placeholders as the request has
+   * images is sent unchanged; otherwise every `<image>` is removed and one
+   * placeholder per image is prefixed (`<image><image>Multi page parsing.`).
    */
   multiPagePrompt?: string;
   /** Whether to request streaming (server-sent events) responses. */
@@ -194,10 +198,18 @@ function parseBackend(value?: string): UnlimitedOCRBackend | undefined {
 
 const VLLM_IMAGE_TOKEN = '<image>';
 
-function withImageToken(prompt: string): string {
-  return prompt.startsWith(VLLM_IMAGE_TOKEN)
-    ? prompt
-    : `${VLLM_IMAGE_TOKEN}${prompt}`;
+/**
+ * vLLM's DeepseekOCRProcessor requires the prompt's `<image>` count to equal
+ * the request's image count. Keep a prompt that already matches; otherwise
+ * drop its placeholders and prefix one per image.
+ */
+function withImageTokens(prompt: string, imageCount: number): string {
+  const placeholders = prompt.split(VLLM_IMAGE_TOKEN).length - 1;
+  if (placeholders === imageCount) {
+    return prompt;
+  }
+  const text = prompt.split(VLLM_IMAGE_TOKEN).join('');
+  return `${VLLM_IMAGE_TOKEN.repeat(imageCount)}${text}`;
 }
 
 function parseImageMode(value?: string): UnlimitedOCRImageMode | undefined {
@@ -265,11 +277,6 @@ export class UnlimitedOCRProvider implements OCRProvider {
 
     const backend =
       config.backend ?? parseBackend(env(ENV_VARS.backend)) ?? 'sglang';
-    const prompt = config.prompt ?? env(ENV_VARS.prompt) ?? 'document parsing.';
-    const multiPagePrompt =
-      config.multiPagePrompt ??
-      env(ENV_VARS.multiPagePrompt) ??
-      'Multi page parsing.';
 
     this.config = {
       transport,
@@ -294,9 +301,11 @@ export class UnlimitedOCRProvider implements OCRProvider {
         'Unlimited-OCR',
       imageMode:
         config.imageMode ?? parseImageMode(env(ENV_VARS.imageMode)) ?? 'auto',
-      prompt: backend === 'vllm' ? withImageToken(prompt) : prompt,
+      prompt: config.prompt ?? env(ENV_VARS.prompt) ?? 'document parsing.',
       multiPagePrompt:
-        backend === 'vllm' ? withImageToken(multiPagePrompt) : multiPagePrompt,
+        config.multiPagePrompt ??
+        env(ENV_VARS.multiPagePrompt) ??
+        'Multi page parsing.',
       stream: config.stream ?? parseBoolean(env(ENV_VARS.stream), true),
       timeout:
         config.timeout ?? parseInteger(env(ENV_VARS.timeout), 20 * 60 * 1000),
@@ -522,8 +531,12 @@ export class UnlimitedOCRProvider implements OCRProvider {
     const validImages = images
       .map((image) => this.imageToDataUrl(image))
       .filter((dataUrl): dataUrl is string => Boolean(dataUrl));
-    const prompt =
+    const basePrompt =
       validImages.length > 1 ? this.config.multiPagePrompt : this.config.prompt;
+    const prompt =
+      this.config.backend === 'vllm'
+        ? withImageTokens(basePrompt, validImages.length)
+        : basePrompt;
     const languageHint = options?.language
       ? ` Preferred OCR language(s): ${options.language}.`
       : '';

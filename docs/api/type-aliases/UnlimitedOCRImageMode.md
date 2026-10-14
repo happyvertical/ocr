@@ -8,7 +8,7 @@
 
 > **UnlimitedOCRImageMode** = `"auto"` \| `"gundam"` \| `"base"`
 
-Defined in: [src/node/unlimited-ocr.ts:50](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L50)
+Defined in: [src/node/unlimited-ocr.ts:51](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L51)
 
 Image processing mode sent to Unlimited-OCR.
 
