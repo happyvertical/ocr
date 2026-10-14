@@ -6,9 +6,9 @@
 
 # Class: UnlimitedOCRProvider
 
-Defined in: [src/node/unlimited-ocr.ts:195](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L195)
+Defined in: [src/node/unlimited-ocr.ts:244](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L244)
 
-OCR provider for baidu/Unlimited-OCR when served by SGLang.
+OCR provider for baidu/Unlimited-OCR when served by SGLang or vLLM.
 
 ## Implements
 
@@ -20,7 +20,7 @@ OCR provider for baidu/Unlimited-OCR when served by SGLang.
 
 > **new UnlimitedOCRProvider**(`config?`): `UnlimitedOCRProvider`
 
-Defined in: [src/node/unlimited-ocr.ts:200](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L200)
+Defined in: [src/node/unlimited-ocr.ts:249](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L249)
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: [src/node/unlimited-ocr.ts:200](https://github.com/happyvertical/ocr
 
 > `readonly` **name**: `"unlimited-ocr"` = `'unlimited-ocr'`
 
-Defined in: [src/node/unlimited-ocr.ts:196](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L196)
+Defined in: [src/node/unlimited-ocr.ts:245](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L245)
 
 Provider name identifier
 
@@ -52,7 +52,7 @@ Provider name identifier
 
 > **performOCR**(`images`, `options?`): `Promise`\<[`OCRResult`](../interfaces/OCRResult.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:262](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L262)
+Defined in: [src/node/unlimited-ocr.ts:318](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L318)
 
 Perform OCR on image data
 
@@ -80,7 +80,7 @@ Perform OCR on image data
 
 > **checkDependencies**(): `Promise`\<[`DependencyCheckResult`](../interfaces/DependencyCheckResult.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:361](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L361)
+Defined in: [src/node/unlimited-ocr.ts:418](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L418)
 
 Check if provider dependencies are available
 
@@ -98,7 +98,7 @@ Check if provider dependencies are available
 
 > **checkCapabilities**(): `Promise`\<[`OCRCapabilities`](../interfaces/OCRCapabilities.md)\>
 
-Defined in: [src/node/unlimited-ocr.ts:402](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L402)
+Defined in: [src/node/unlimited-ocr.ts:460](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L460)
 
 Get provider capabilities
 
@@ -116,7 +116,7 @@ Get provider capabilities
 
 > **getSupportedLanguages**(): `string`[]
 
-Defined in: [src/node/unlimited-ocr.ts:419](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L419)
+Defined in: [src/node/unlimited-ocr.ts:478](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L478)
 
 Get supported languages
 
@@ -134,7 +134,7 @@ Get supported languages
 
 > **cleanup**(): `Promise`\<`void`\>
 
-Defined in: [src/node/unlimited-ocr.ts:455](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L455)
+Defined in: [src/node/unlimited-ocr.ts:514](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L514)
 
 Clean up provider resources (optional)
 

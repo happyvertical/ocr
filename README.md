@@ -43,7 +43,7 @@ yarn add @happyvertical/ocr
 bun add @happyvertical/ocr
 ```
 
-The package includes Tesseract.js by default, a PaddleOCR ONNX provider with package-owned Sharp 0.35 and ONNX Runtime dependencies, LLM-backed OCR through `@happyvertical/ai`, and a Node.js provider for Baidu Unlimited-OCR when you run it behind SGLang or Bifrost. PaddleOCR model assets continue to load from `@gutenye/ocr-models`; no model binaries are checked into this repository. Provider discovery does not load the Sharp or ONNX Runtime native addons. Dependency checks validate both addons in an isolated child process, and the ONNX provider loads them through the server-only `@happyvertical/ocr/node` boundary when it performs its first OCR operation. This keeps browser and SSR builds from traversing native dependencies, while keeping discovery and dependency checks safe in processes that also use native document or image libraries such as Kreuzberg and Sharp.
+The package includes Tesseract.js by default, a PaddleOCR ONNX provider with package-owned Sharp 0.35 and ONNX Runtime dependencies, LLM-backed OCR through `@happyvertical/ai`, and a Node.js provider for Baidu Unlimited-OCR when you serve it with vLLM or SGLang, directly or behind Bifrost. PaddleOCR model assets continue to load from `@gutenye/ocr-models`; no model binaries are checked into this repository. Provider discovery does not load the Sharp or ONNX Runtime native addons. Dependency checks validate both addons in an isolated child process, and the ONNX provider loads them through the server-only `@happyvertical/ocr/node` boundary when it performs its first OCR operation. This keeps browser and SSR builds from traversing native dependencies, while keeping discovery and dependency checks safe in processes that also use native document or image libraries such as Kreuzberg and Sharp.
 
 ## Quick Start
 
@@ -160,17 +160,39 @@ console.log('LLM OCR completed:', result.text);
 
 ### Unlimited-OCR Provider (Node.js, Served GPU Model)
 
-The `unlimited-ocr` provider talks to a running [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) SGLang server through an OpenAI-compatible chat completions endpoint. The endpoint can be direct, or routed through HappyVertical Bifrost.
+The `unlimited-ocr` provider talks to a running [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) server through an OpenAI-compatible chat completions endpoint. The server can be vLLM or SGLang, and the endpoint can be direct, or routed through HappyVertical Bifrost.
+
+The two servers expect different request fields, so set the backend to match the server (`backend` in config, or `HAVE_OCR_UNLIMITED_BACKEND`). The default is `sglang`, so existing SGLang configurations keep their request shape:
+
+| | `vllm` | `sglang` (default) |
+| --- | --- | --- |
+| N-gram logits-processor args | `vllm_xargs: { ngram_size, window_size }` | `custom_params: { ngram_size, window_size }` |
+| Default prompts | `<image>document parsing.` / `<image>Multi page parsing.` (configured prompts get the `<image>` prefix if they lack it) | `document parsing.` / `Multi page parsing.` |
+| Image mode | chosen by the server | `images_config.image_mode` (`HAVE_OCR_UNLIMITED_IMAGE_MODE`) |
+| `custom_logit_processor` | not sent (the processor is enabled server-side) | sent when configured |
+
+Both backends send `skip_special_tokens: false`, put the text part before the image parts, and use an n-gram window of 128 for one image and 1024 for multi-image/multi-page requests (`HAVE_OCR_UNLIMITED_SINGLE_IMAGE_NGRAM_WINDOW`, `HAVE_OCR_UNLIMITED_MULTI_IMAGE_NGRAM_WINDOW`, or `HAVE_OCR_UNLIMITED_NGRAM_WINDOW` for all requests; `HAVE_OCR_UNLIMITED_NGRAM_SIZE` defaults to 35). vLLM ignores request fields it does not know, so a vLLM server sent the SGLang shape runs without the n-gram args, and long documents can loop on coordinate tokens.
 
 When `transport` is not set explicitly, the provider stays on `direct` whenever an Unlimited-OCR base URL is supplied (`baseUrl` or `HAVE_OCR_UNLIMITED_BASE_URL`); Bifrost is inferred from Bifrost environment variables only when no direct endpoint is configured.
 
 This provider does not load the Python/CUDA model inside Node.js. You still need to run the model server somewhere with GPU access.
+
+**Direct vLLM endpoint:**
+
+```bash
+export HAVE_OCR_PROVIDER=unlimited-ocr
+export HAVE_OCR_UNLIMITED_TRANSPORT=direct
+export HAVE_OCR_UNLIMITED_BACKEND=vllm
+export HAVE_OCR_UNLIMITED_BASE_URL=http://127.0.0.1:8000
+export HAVE_OCR_UNLIMITED_MODEL=Unlimited-OCR
+```
 
 **Direct SGLang endpoint:**
 
 ```bash
 export HAVE_OCR_PROVIDER=unlimited-ocr
 export HAVE_OCR_UNLIMITED_TRANSPORT=direct
+export HAVE_OCR_UNLIMITED_BACKEND=sglang
 export HAVE_OCR_UNLIMITED_BASE_URL=http://127.0.0.1:10000
 export HAVE_OCR_UNLIMITED_MODEL=Unlimited-OCR
 ```
@@ -220,7 +242,8 @@ const ocr = getOCR({
   providerConfig: {
     'unlimited-ocr': {
       transport: 'direct',
-      baseUrl: 'http://127.0.0.1:10000',
+      backend: 'vllm',
+      baseUrl: 'http://127.0.0.1:8000',
       model: 'Unlimited-OCR',
       stream: true
     }
@@ -228,7 +251,24 @@ const ocr = getOCR({
 });
 ```
 
-**Running the model server:**
+**Running the model server with vLLM:**
+
+Follow the [vLLM recipe](https://recipes.vllm.ai/baidu/Unlimited-OCR). The server needs the recipe image and its n-gram logits processor; without the processor, long documents loop on coordinate tokens:
+
+```bash
+docker run --rm --gpus all --network host --ipc host \
+  vllm/vllm-openai:unlimited-ocr \
+  baidu/Unlimited-OCR \
+  --served-model-name Unlimited-OCR \
+  --trust-remote-code \
+  --logits_processors vllm.model_executor.models.unlimited_ocr:NGramPerReqLogitsProcessor \
+  --no-enable-prefix-caching \
+  --mm-processor-cache-gb 0
+```
+
+With `backend: 'vllm'` the provider sends the per-request `vllm_xargs` that this processor reads.
+
+**Running the model server with SGLang:**
 
 Follow the Unlimited-OCR model card for the exact SGLang environment. The documented server shape is:
 
@@ -256,7 +296,7 @@ print(DeepseekOCRNoRepeatNGramLogitProcessor.to_str())
 PY
 ```
 
-The provider sends `gundam` image mode for one image and `base` image mode for multi-image/multi-page requests by default. Override with `HAVE_OCR_UNLIMITED_IMAGE_MODE=base` or `gundam` when needed.
+With the `sglang` backend, the provider sends `gundam` image mode for one image and `base` image mode for multi-image/multi-page requests by default. Override with `HAVE_OCR_UNLIMITED_IMAGE_MODE=base` or `gundam` when needed.
 
 ## Advanced Usage
 

@@ -8,9 +8,9 @@
 
 > **UnlimitedOCRImageMode** = `"auto"` \| `"gundam"` \| `"base"`
 
-Defined in: [src/node/unlimited-ocr.ts:35](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L35)
+Defined in: [src/node/unlimited-ocr.ts:50](https://github.com/happyvertical/ocr/blob/main/src/node/unlimited-ocr.ts#L50)
 
 Image processing mode sent to Unlimited-OCR.
 
 `auto` uses `gundam` for single-image requests and `base` for multi-image
-or multi-page requests.
+or multi-page requests. Only the `sglang` backend sends it.

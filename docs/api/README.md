@@ -99,6 +99,7 @@ result.detections?.forEach(detection => {
 - [LiteLLMOutputMode](type-aliases/LiteLLMOutputMode.md)
 - [LiteLLMAuthType](type-aliases/LiteLLMAuthType.md)
 - [UnlimitedOCRTransport](type-aliases/UnlimitedOCRTransport.md)
+- [UnlimitedOCRBackend](type-aliases/UnlimitedOCRBackend.md)
 - [UnlimitedOCRImageMode](type-aliases/UnlimitedOCRImageMode.md)
 - [OCREnvironment](type-aliases/OCREnvironment.md)
 

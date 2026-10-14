@@ -91,6 +91,7 @@ export type {
 export { LiteLLMProvider } from './node/litellm';
 
 export type {
+  UnlimitedOCRBackend,
   UnlimitedOCRImageMode,
   UnlimitedOCRProviderConfig,
   UnlimitedOCRTransport,

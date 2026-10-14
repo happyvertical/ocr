@@ -1,7 +1,7 @@
-// biome-ignore-all lint/style/useNamingConvention: SGLang/OpenAI request fields are snake_case.
+// biome-ignore-all lint/style/useNamingConvention: SGLang/vLLM/OpenAI request fields are snake_case.
 // biome-ignore-all lint/complexity/useLiteralKeys: Tests assert exact wire-format field names.
 
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { UnlimitedOCRProvider } from './unlimited-ocr';
 
 const originalEnv = { ...process.env };
@@ -21,6 +21,10 @@ function pngBuffer(): Buffer {
 }
 
 describe('UnlimitedOCRProvider', () => {
+  beforeEach(() => {
+    delete process.env.HAVE_OCR_UNLIMITED_BACKEND;
+  });
+
   afterEach(() => {
     process.env = { ...originalEnv };
     vi.unstubAllGlobals();
@@ -326,5 +330,179 @@ describe('UnlimitedOCRProvider', () => {
     await expect(
       provider.performOCR([{ data: pngBuffer() }], { timeout: 1 }),
     ).rejects.toThrow('1ms');
+  });
+  describe('vllm backend', () => {
+    function captureBody() {
+      const bodies: Array<Record<string, unknown>> = [];
+      const fetchMock = vi.fn(
+        async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+          expect(String(input)).toBe(
+            'http://127.0.0.1:8000/v1/chat/completions',
+          );
+          bodies.push(
+            JSON.parse(String(init?.body)) as Record<string, unknown>,
+          );
+          return Response.json({
+            choices: [{ message: { content: 'vLLM text' } }],
+          });
+        },
+      );
+      vi.stubGlobal('fetch', fetchMock);
+      return bodies;
+    }
+
+    function contentOf(body: Record<string, unknown>) {
+      const messages = body.messages as Array<{
+        content: Array<{ type: string; text?: string; image_url?: unknown }>;
+      }>;
+      return messages[0].content;
+    }
+
+    test('sends the vLLM recipe request shape for one image', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        stream: false,
+        // SGLang-only knobs must not leak into a vLLM request.
+        customLogitProcessor: 'processor-string',
+        imageMode: 'base',
+      });
+
+      const result = await provider.performOCR([{ data: pngBuffer() }]);
+
+      const body = bodies[0];
+      expect(body).toMatchObject({
+        model: 'Unlimited-OCR',
+        temperature: 0,
+        skip_special_tokens: false,
+        stream: false,
+        vllm_xargs: { ngram_size: 35, window_size: 128 },
+      });
+      expect(body).not.toHaveProperty('custom_params');
+      expect(body).not.toHaveProperty('images_config');
+      expect(body).not.toHaveProperty('custom_logit_processor');
+      const content = contentOf(body);
+      expect(content).toHaveLength(2);
+      expect(content[0]).toEqual({
+        type: 'text',
+        text: '<image>document parsing.',
+      });
+      expect(content[1].type).toBe('image_url');
+      expect(result.text).toBe('vLLM text');
+      expect(result.metadata).toMatchObject({
+        backend: 'vllm',
+        imageMode: 'gundam',
+      });
+    });
+
+    test('uses the multi-page prompt and 1024 window for multiple images', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        stream: false,
+      });
+
+      const result = await provider.performOCR(
+        [{ data: pngBuffer() }, { data: pngBuffer() }],
+        { language: 'eng' },
+      );
+
+      const body = bodies[0];
+      expect(body['vllm_xargs']).toEqual({ ngram_size: 35, window_size: 1024 });
+      expect(body).not.toHaveProperty('images_config');
+      const content = contentOf(body);
+      expect(content).toHaveLength(3);
+      expect(content[0]).toEqual({
+        type: 'text',
+        text: '<image>Multi page parsing. Preferred OCR language(s): eng.',
+      });
+      expect(result.metadata?.imageMode).toBe('base');
+    });
+
+    test('reads backend, prompts, and n-gram overrides from env', async () => {
+      process.env.HAVE_OCR_UNLIMITED_BACKEND = 'VLLM';
+      process.env.HAVE_OCR_UNLIMITED_PROMPT = 'Free OCR.';
+      process.env.HAVE_OCR_UNLIMITED_NGRAM_SIZE = '20';
+      process.env.HAVE_OCR_UNLIMITED_NGRAM_WINDOW = '512';
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        stream: false,
+      });
+
+      await provider.performOCR([{ data: pngBuffer() }]);
+
+      const body = bodies[0];
+      expect(body['vllm_xargs']).toEqual({ ngram_size: 20, window_size: 512 });
+      expect(contentOf(body)[0].text).toBe('<image>Free OCR.');
+      await expect(provider.checkDependencies()).resolves.toMatchObject({
+        details: { backend: 'vllm' },
+      });
+    });
+
+    test('does not double the <image> token on an already-prefixed prompt', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        prompt: '<image>document parsing.',
+        stream: false,
+      });
+
+      await provider.performOCR([{ data: pngBuffer() }]);
+
+      expect(contentOf(bodies[0])[0].text).toBe('<image>document parsing.');
+    });
+
+    test('lets extraRequestBody override vllm_xargs last', async () => {
+      const bodies = captureBody();
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:8000',
+        backend: 'vllm',
+        stream: false,
+        extraRequestBody: { max_tokens: 8192 },
+      });
+
+      await provider.performOCR([{ data: pngBuffer() }]);
+
+      expect(bodies[0]).toMatchObject({
+        max_tokens: 8192,
+        vllm_xargs: { ngram_size: 35, window_size: 128 },
+      });
+    });
+
+    test('defaults to the sglang backend and ignores unknown backend env', async () => {
+      process.env.HAVE_OCR_UNLIMITED_BACKEND = 'tgi';
+      const bodies: Array<Record<string, unknown>> = [];
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          async (_input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+            bodies.push(
+              JSON.parse(String(init?.body)) as Record<string, unknown>,
+            );
+            return Response.json({ choices: [{ message: { content: 'x' } }] });
+          },
+        ),
+      );
+      const provider = new UnlimitedOCRProvider({
+        baseUrl: 'http://127.0.0.1:10000',
+        stream: false,
+      });
+
+      await provider.performOCR([{ data: pngBuffer() }]);
+
+      expect(bodies[0]).not.toHaveProperty('vllm_xargs');
+      expect(bodies[0]['custom_params']).toEqual({
+        ngram_size: 35,
+        window_size: 128,
+      });
+      expect(contentOf(bodies[0])[0].text).toBe('document parsing.');
+      await expect(provider.checkCapabilities()).resolves.toMatchObject({
+        providerSpecific: { backend: 'sglang' },
+      });
+    });
   });
 });
