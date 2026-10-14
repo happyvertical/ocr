@@ -7,6 +7,9 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 const repository = new URL('..', import.meta.url);
 const workspace = await mkdtemp(join(tmpdir(), 'ocr-vite-consumer-'));
+const { packageManager } = JSON.parse(
+  await readFile(new URL('package.json', repository), 'utf8'),
+);
 
 try {
   const { stdout } = await execFileAsync(
@@ -31,7 +34,7 @@ try {
         name: 'ocr-vite-8-consumer',
         private: true,
         type: 'module',
-        packageManager: 'pnpm@11.13.0',
+        packageManager,
         dependencies: {
           '@happyvertical/ocr': `file:${tarball}`,
           vite: '8.1.4',
