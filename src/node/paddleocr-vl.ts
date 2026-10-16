@@ -51,6 +51,22 @@ function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+type Sharp = typeof import('sharp').default;
+
+/**
+ * Load sharp only when a conversion is needed, so discovery and PNG/JPEG
+ * requests never load the native addon. The specifier is kept opaque so
+ * browser and SSR bundlers do not pull sharp into a consumer's graph (the same
+ * pattern as the factory's `loadNodeOCRModule`).
+ */
+async function loadSharp(): Promise<Sharp> {
+  const specifier = ['sh', 'arp'].join('');
+  const mod = (await import(/* @vite-ignore */ specifier)) as {
+    default?: Sharp;
+  } & Sharp;
+  return mod.default ?? mod;
+}
+
 /** Recognize an encoded image by its signature. */
 function sniff(data: Uint8Array): string | null {
   const at = (i: number) => data[i];
@@ -292,40 +308,51 @@ export class PaddleOCRVLProvider implements OCRProvider {
   /** One PNG or JPEG per page: multi-page TIFFs expand to every page. */
   private async toPages(image: OCRImage): Promise<Uint8Array[]> {
     const bytes = this.bytesOf(image);
-    const type = sniff(bytes);
-    if (type && PASSTHROUGH.has(type)) return [bytes];
+    const { width, height, channels } = image;
 
+    // Raw pixels are identified by their declared shape, not by sniffing:
+    // a pixel buffer can start with bytes that look like a BMP or GIF header.
+    const declaresRaw =
+      typeof width === 'number' &&
+      typeof height === 'number' &&
+      typeof channels === 'number';
     const isRaw =
-      !type &&
-      typeof image.width === 'number' &&
-      typeof image.height === 'number' &&
-      typeof image.channels === 'number';
+      declaresRaw &&
+      [1, 2, 3, 4].includes(channels) &&
+      bytes.byteLength === width * height * channels &&
+      (image.bitsPerComponent === undefined || image.bitsPerComponent === 8);
+    const type = isRaw ? null : sniff(bytes);
+    if (type && PASSTHROUGH.has(type)) return [bytes];
     if (!type && !isRaw) {
       throw new OCRProcessingError(
         this.name,
-        'Unsupported image: expected PNG, JPEG, TIFF, WebP, GIF, BMP or raw pixels with dimensions',
+        declaresRaw
+          ? 'Unsupported raw pixels: expected 8-bit samples, 1 to 4 channels, and width x height x channels bytes'
+          : 'Unsupported image: expected PNG, JPEG, TIFF, WebP, GIF, BMP or raw pixels with dimensions',
       );
     }
 
-    // Loaded only when a conversion is needed, so discovery and PNG/JPEG
-    // requests never load the native addon.
-    const { default: sharp } = await import('sharp');
+    const sharp = await loadSharp();
     try {
       if (isRaw) {
-        const channels = image.channels as 1 | 2 | 3 | 4;
         return [
           await sharp(Buffer.from(bytes), {
             raw: {
-              width: image.width as number,
-              height: image.height as number,
-              channels,
+              width: width as number,
+              height: height as number,
+              channels: channels as 1 | 2 | 3 | 4,
             },
           })
             .png()
             .toBuffer(),
         ];
       }
-      const { pages = 1 } = await sharp(Buffer.from(bytes)).metadata();
+      // Only TIFF pages are document pages. For animated GIF or WebP,
+      // `pages` counts frames, so only the first frame is sent.
+      const { pages = 1 } =
+        type === 'image/tiff'
+          ? await sharp(Buffer.from(bytes)).metadata()
+          : { pages: 1 };
       const out: Uint8Array[] = [];
       for (let page = 0; page < pages; page++) {
         out.push(await sharp(Buffer.from(bytes), { page }).png().toBuffer());

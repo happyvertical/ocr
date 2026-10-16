@@ -293,4 +293,55 @@ describe('PaddleOCRVLProvider', () => {
     expect(auto.getProviderPriority()).not.toContain('paddleocr-vl');
     expect(calls).toHaveLength(2);
   });
+
+  test('sends only the first frame of an animated GIF', async () => {
+    const frames = await Promise.all(
+      ['#ff0000', '#00ff00', '#0000ff'].map((background) =>
+        sharp({ create: { width: 20, height: 10, channels: 3, background } })
+          .png()
+          .toBuffer(),
+      ),
+    );
+    const gif = await sharp(frames, { join: { animated: true } })
+      .gif()
+      .toBuffer();
+    expect((await sharp(gif).metadata()).pages).toBe(3);
+
+    const result = await new PaddleOCRVLProvider({ baseUrl }).performOCR([
+      { data: gif },
+    ]);
+
+    expect(calls).toHaveLength(1);
+    expect(result.metadata?.pages).toBe(1);
+  });
+
+  test('refuses 16-bit or mis-sized raw pixels, and treats declared raw as raw', async () => {
+    const provider = new PaddleOCRVLProvider({ baseUrl });
+    await expect(
+      provider.performOCR([
+        {
+          data: new Uint8Array(4 * 4 * 2),
+          width: 4,
+          height: 4,
+          channels: 1,
+          bitsPerComponent: 16,
+        },
+      ]),
+    ).rejects.toThrow(/8-bit samples/);
+    await expect(
+      provider.performOCR([
+        { data: new Uint8Array(5), width: 4, height: 4, channels: 1 },
+      ]),
+    ).rejects.toThrow(/width x height x channels/);
+    expect(calls).toHaveLength(0);
+
+    // Starts with "BM", which would sniff as BMP.
+    const raw = new Uint8Array(2 * 2 * 3).fill(255);
+    raw[0] = 0x42;
+    raw[1] = 0x4d;
+    await provider.performOCR([
+      { data: raw, width: 2, height: 2, channels: 3 },
+    ]);
+    expect(calls.map(kind)).toEqual(['PNG']);
+  });
 });
