@@ -182,8 +182,10 @@ export class PaddleOCRVLProvider implements OCRProvider {
       confidence: text ? 100 : 0,
       detections: texts
         .map((pageText) => pageText.trim())
-        .filter(Boolean)
-        .map((pageText) => ({ text: pageText, confidence: 100 })),
+        .map((pageText) => ({
+          text: pageText,
+          confidence: pageText ? 100 : 0,
+        })),
       metadata: {
         processingTime: Date.now() - started,
         provider: this.name,

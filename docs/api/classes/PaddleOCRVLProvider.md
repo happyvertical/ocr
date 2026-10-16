@@ -89,7 +89,7 @@ cold start. Use the provider's own `timeout`.
 
 > **checkDependencies**(): `Promise`\<[`DependencyCheckResult`](../interfaces/DependencyCheckResult.md)\>
 
-Defined in: [src/node/paddleocr-vl.ts:200](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L200)
+Defined in: [src/node/paddleocr-vl.ts:202](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L202)
 
 Configuration only. The service is not probed: a proxy `/health` success
 does not mean the model is loaded.
@@ -108,7 +108,7 @@ does not mean the model is loaded.
 
 > **checkCapabilities**(): `Promise`\<[`OCRCapabilities`](../interfaces/OCRCapabilities.md)\>
 
-Defined in: [src/node/paddleocr-vl.ts:228](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L228)
+Defined in: [src/node/paddleocr-vl.ts:230](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L230)
 
 Get provider capabilities
 
@@ -126,7 +126,7 @@ Get provider capabilities
 
 > **getSupportedLanguages**(): `string`[]
 
-Defined in: [src/node/paddleocr-vl.ts:253](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L253)
+Defined in: [src/node/paddleocr-vl.ts:255](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L255)
 
 PaddleOCR-VL recognizes 100+ languages and needs no language hint.
 
@@ -144,7 +144,7 @@ PaddleOCR-VL recognizes 100+ languages and needs no language hint.
 
 > **cleanup**(): `Promise`\<`void`\>
 
-Defined in: [src/node/paddleocr-vl.ts:257](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L257)
+Defined in: [src/node/paddleocr-vl.ts:259](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L259)
 
 Clean up provider resources (optional)
 

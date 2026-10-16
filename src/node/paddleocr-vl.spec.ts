@@ -137,6 +137,15 @@ describe('PaddleOCRVLProvider', () => {
       }),
     );
     expect(dominant).toEqual([0, 1, 2]);
+    calls = [];
+    respond = (res, n) => json(res, envelope(n === 2 ? '' : `page ${n}`));
+    const withBlank = await provider.performOCR([{ data: tiff }]);
+    expect(withBlank.metadata?.pages).toBe(3);
+    expect(withBlank.detections).toEqual([
+      { text: 'page 1', confidence: 100 },
+      { text: '', confidence: 0 },
+      { text: 'page 3', confidence: 100 },
+    ]);
   });
 
   test('converts WebP and raw pixels to PNG', async () => {
@@ -370,6 +379,7 @@ describe('PaddleOCRVLProvider', () => {
       text: '',
       confidence: 0,
       metadata: { pages: 1 },
+      detections: [{ text: '', confidence: 0 }],
     });
   });
 
