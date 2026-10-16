@@ -71,6 +71,7 @@ result.detections?.forEach(detection => {
 ## Classes
 
 - [LiteLLMProvider](classes/LiteLLMProvider.md)
+- [PaddleOCRVLProvider](classes/PaddleOCRVLProvider.md)
 - [UnlimitedOCRProvider](classes/UnlimitedOCRProvider.md)
 - [OCRFactory](classes/OCRFactory.md)
 - [OCRError](classes/OCRError.md)
@@ -82,6 +83,7 @@ result.detections?.forEach(detection => {
 
 - [OAuth2Config](interfaces/OAuth2Config.md)
 - [LiteLLMProviderConfig](interfaces/LiteLLMProviderConfig.md)
+- [PaddleOCRVLProviderConfig](interfaces/PaddleOCRVLProviderConfig.md)
 - [UnlimitedOCRProviderConfig](interfaces/UnlimitedOCRProviderConfig.md)
 - [OCROptions](interfaces/OCROptions.md)
 - [OCRImage](interfaces/OCRImage.md)

@@ -8,7 +8,7 @@
 
 > **isProviderAvailable**(`providerName`): `Promise`\<`boolean`\>
 
-Defined in: [src/shared/factory.ts:943](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L943)
+Defined in: [src/shared/factory.ts:961](https://github.com/happyvertical/ocr/blob/main/src/shared/factory.ts#L961)
 
 Check if a specific OCR provider is available and ready to use.
 

@@ -89,7 +89,9 @@ export type {
 } from './node/litellm';
 // Export LiteLLM provider for direct instantiation
 export { LiteLLMProvider } from './node/litellm';
-
+export type { PaddleOCRVLProviderConfig } from './node/paddleocr-vl';
+// Export PaddleOCR-VL provider for direct instantiation (loads sharp lazily)
+export { PaddleOCRVLProvider } from './node/paddleocr-vl';
 export type {
   UnlimitedOCRBackend,
   UnlimitedOCRImageMode,

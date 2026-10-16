@@ -1,0 +1,156 @@
+[**@happyvertical/ocr**](../README.md)
+
+***
+
+[@happyvertical/ocr](../README.md) / PaddleOCRVLProvider
+
+# Class: PaddleOCRVLProvider
+
+Defined in: [src/node/paddleocr-vl.ts:109](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L109)
+
+OCR provider for a PaddleOCR-VL `/layout-parsing` service.
+
+Each image page is one request (`fileType: 1`); results are joined in
+order. PNG and JPEG are sent unchanged; TIFF (every page), WebP, GIF, BMP
+and raw pixel buffers are converted to PNG with `sharp` first. Requests are
+not retried: a dropped connection can leave a GPU parse running.
+
+## Implements
+
+- [`OCRProvider`](../interfaces/OCRProvider.md)
+
+## Constructors
+
+### Constructor
+
+> **new PaddleOCRVLProvider**(`config?`): `PaddleOCRVLProvider`
+
+Defined in: [src/node/paddleocr-vl.ts:116](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L116)
+
+#### Parameters
+
+##### config?
+
+[`PaddleOCRVLProviderConfig`](../interfaces/PaddleOCRVLProviderConfig.md) = `{}`
+
+#### Returns
+
+`PaddleOCRVLProvider`
+
+## Properties
+
+### name
+
+> `readonly` **name**: `"paddleocr-vl"` = `'paddleocr-vl'`
+
+Defined in: [src/node/paddleocr-vl.ts:110](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L110)
+
+Provider name identifier
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`name`](../interfaces/OCRProvider.md#name)
+
+## Methods
+
+### performOCR()
+
+> **performOCR**(`images`, `_options?`): `Promise`\<[`OCRResult`](../interfaces/OCRResult.md)\>
+
+Defined in: [src/node/paddleocr-vl.ts:137](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L137)
+
+`options` carries nothing this service uses: it needs no language hint,
+and `options.timeout` is ignored because the factory fills it from
+`HAVE_OCR_TIMEOUT`, a limit sized for local engines that would cut off a
+cold start. Use the provider's own `timeout`.
+
+#### Parameters
+
+##### images
+
+[`OCRImage`](../interfaces/OCRImage.md)[]
+
+##### \_options?
+
+[`OCROptions`](../interfaces/OCROptions.md)
+
+#### Returns
+
+`Promise`\<[`OCRResult`](../interfaces/OCRResult.md)\>
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`performOCR`](../interfaces/OCRProvider.md#performocr)
+
+***
+
+### checkDependencies()
+
+> **checkDependencies**(): `Promise`\<[`DependencyCheckResult`](../interfaces/DependencyCheckResult.md)\>
+
+Defined in: [src/node/paddleocr-vl.ts:183](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L183)
+
+Configuration only. The service is not probed: a proxy `/health` success
+does not mean the model is loaded.
+
+#### Returns
+
+`Promise`\<[`DependencyCheckResult`](../interfaces/DependencyCheckResult.md)\>
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`checkDependencies`](../interfaces/OCRProvider.md#checkdependencies)
+
+***
+
+### checkCapabilities()
+
+> **checkCapabilities**(): `Promise`\<[`OCRCapabilities`](../interfaces/OCRCapabilities.md)\>
+
+Defined in: [src/node/paddleocr-vl.ts:211](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L211)
+
+Get provider capabilities
+
+#### Returns
+
+`Promise`\<[`OCRCapabilities`](../interfaces/OCRCapabilities.md)\>
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`checkCapabilities`](../interfaces/OCRProvider.md#checkcapabilities)
+
+***
+
+### getSupportedLanguages()
+
+> **getSupportedLanguages**(): `string`[]
+
+Defined in: [src/node/paddleocr-vl.ts:236](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L236)
+
+PaddleOCR-VL recognizes 100+ languages and needs no language hint.
+
+#### Returns
+
+`string`[]
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`getSupportedLanguages`](../interfaces/OCRProvider.md#getsupportedlanguages)
+
+***
+
+### cleanup()
+
+> **cleanup**(): `Promise`\<`void`\>
+
+Defined in: [src/node/paddleocr-vl.ts:240](https://github.com/happyvertical/ocr/blob/main/src/node/paddleocr-vl.ts#L240)
+
+Clean up provider resources (optional)
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Implementation of
+
+[`OCRProvider`](../interfaces/OCRProvider.md).[`cleanup`](../interfaces/OCRProvider.md#cleanup)

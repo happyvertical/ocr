@@ -273,6 +273,23 @@ export class OCRFactory {
         } catch {
           // Ignore if Unlimited-OCR provider fails to load
         }
+
+        // PaddleOCR-VL provider (Node.js only) - a served layout-parsing
+        // pipeline. Explicit only: it is not in the auto priority list.
+        try {
+          const { PaddleOCRVLProvider } = await import(
+            '../node/paddleocr-vl.js'
+          );
+          const providerOptions = this.providerConfig['paddleocr-vl'] as
+            | ConstructorParameters<typeof PaddleOCRVLProvider>[0]
+            | undefined;
+          this.providers.set(
+            'paddleocr-vl',
+            new PaddleOCRVLProvider(providerOptions),
+          );
+        } catch {
+          // Ignore if the PaddleOCR-VL provider fails to load
+        }
       } else if (this.environment === 'browser') {
         // Browser-specific providers
         try {
@@ -335,7 +352,8 @@ export class OCRFactory {
    */
   private getDefaultProviderPriority(): string[] {
     if (this.environment === 'node') {
-      // LiteLLM last since it's API-based (network latency, costs money)
+      // LiteLLM last since it's API-based (network latency, costs money).
+      // paddleocr-vl is deliberately absent: it must be named explicitly.
       return ['onnx', 'tesseract', 'unlimited-ocr', 'litellm'];
     }
     if (this.environment === 'browser') {
