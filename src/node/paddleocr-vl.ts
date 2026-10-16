@@ -54,8 +54,8 @@ function record(value: unknown): value is Record<string, unknown> {
 type Sharp = typeof import('sharp').default;
 
 /**
- * Load sharp only when a conversion is needed, so discovery and PNG/JPEG
- * requests never load the native addon. The specifier is kept opaque so
+ * Load sharp only when processing images, so provider discovery never loads
+ * the native addon. PNG/JPEG decoding validates input without rewriting it. The specifier is kept opaque so
  * browser and SSR bundlers do not pull sharp into a consumer's graph (the same
  * pattern as the factory's `loadNodeOCRModule`).
  */
@@ -119,7 +119,8 @@ function sniff(data: Uint8Array): string | null {
  *
  * Each image page is one request (`fileType: 1`); results are joined in
  * order. PNG and JPEG are sent unchanged; TIFF (every page), WebP, GIF, BMP
- * and raw pixel buffers are converted to PNG with `sharp` first. Requests are
+ * and raw pixel buffers are converted to PNG first (`bmp-ts` decodes BMP;
+ * `sharp` encodes PNG). Requests are
  * not retried: a dropped connection can leave a GPU parse running.
  */
 export class PaddleOCRVLProvider implements OCRProvider {
@@ -301,7 +302,11 @@ export class PaddleOCRVLProvider implements OCRProvider {
         'Image URLs are not supported; pass bytes, base64 or a local path',
       );
     }
-    if (existsSync(data)) return readFileSync(data);
+    try {
+      if (existsSync(data)) return readFileSync(data);
+    } catch {
+      throw new OCRProcessingError(this.name, 'Image file could not be read');
+    }
     return Buffer.from(data, 'base64');
   }
 
@@ -322,7 +327,6 @@ export class PaddleOCRVLProvider implements OCRProvider {
       bytes.byteLength === width * height * channels &&
       (image.bitsPerComponent === undefined || image.bitsPerComponent === 8);
     const type = isRaw ? null : sniff(bytes);
-    if (type && PASSTHROUGH.has(type)) return [bytes];
     if (!type && !isRaw) {
       throw new OCRProcessingError(
         this.name,
@@ -332,8 +336,14 @@ export class PaddleOCRVLProvider implements OCRProvider {
       );
     }
 
-    const sharp = await loadSharp();
     try {
+      const sharp = await loadSharp();
+      if (type && PASSTHROUGH.has(type)) {
+        // Decode fully to reject corrupt/truncated input before transmission,
+        // but preserve the original encoded bytes and metadata on the wire.
+        await sharp(Buffer.from(bytes)).stats();
+        return [bytes];
+      }
       if (isRaw) {
         return [
           await sharp(Buffer.from(bytes), {
@@ -342,6 +352,42 @@ export class PaddleOCRVLProvider implements OCRProvider {
               height: height as number,
               channels: channels as 1 | 2 | 3 | 4,
             },
+          })
+            .png()
+            .toBuffer(),
+        ];
+      }
+      if (type === 'image/bmp') {
+        const buffer = Buffer.from(bytes);
+        // Validate dimensions before the BMP decoder allocates a pixel buffer.
+        // Match sharp's default pixel limit; malformed/truncated headers fail
+        // inside this same sanitized decoder-error boundary.
+        const width = buffer.readInt32LE(18);
+        const height = Math.abs(buffer.readInt32LE(22));
+        const offset = buffer.readUInt32LE(10);
+        const bitDepth = buffer.readUInt16LE(28);
+        const compression = buffer.readUInt32LE(30);
+        const stride = Math.ceil((width * bitDepth) / 32) * 4;
+        if (
+          width <= 0 ||
+          height <= 0 ||
+          width * height > 268_402_689 ||
+          ![1, 4, 8, 16, 24, 32].includes(bitDepth) ||
+          ![0, 1, 2, 3, 6].includes(compression) ||
+          offset < 54 ||
+          offset >= buffer.length ||
+          ([0, 3, 6].includes(compression) &&
+            offset + stride * height > buffer.length)
+        )
+          throw new Error('Invalid BMP dimensions or pixel data');
+        const specifier = ['bmp', 'ts'].join('-');
+        const { decode } = (await import(
+          /* @vite-ignore */ specifier
+        )) as typeof import('bmp-ts');
+        const decoded = decode(buffer, { toRGBA: true });
+        return [
+          await sharp(decoded.data, {
+            raw: { width: decoded.width, height: decoded.height, channels: 4 },
           })
             .png()
             .toBuffer(),
@@ -429,7 +475,11 @@ export class PaddleOCRVLProvider implements OCRProvider {
       );
     }
     const result = value.result;
-    if (!record(result) || !Array.isArray(result.layoutParsingResults)) {
+    if (
+      !record(result) ||
+      !Array.isArray(result.layoutParsingResults) ||
+      result.layoutParsingResults.length !== 1
+    ) {
       throw invalid();
     }
     return result.layoutParsingResults

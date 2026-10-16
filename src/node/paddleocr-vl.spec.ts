@@ -191,6 +191,33 @@ describe('PaddleOCRVLProvider', () => {
     expect(calls).toHaveLength(0);
   });
 
+  test('refuses truncated PNG and JPEG before any remote request', async () => {
+    const provider = new PaddleOCRVLProvider({ baseUrl });
+    for (const data of [
+      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+      Buffer.from([255, 216, 255]),
+    ]) {
+      await expect(provider.performOCR([{ data }])).rejects.toBeInstanceOf(
+        OCRProcessingError,
+      );
+    }
+    expect(calls).toHaveLength(0);
+  });
+
+  test('sanitizes local read failures', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'private-document-'));
+    try {
+      const error = await new PaddleOCRVLProvider({ baseUrl })
+        .performOCR([{ data: dir }])
+        .catch((e) => e);
+      expect(error).toBeInstanceOf(OCRProcessingError);
+      expect(error.message).not.toContain(dir);
+      expect(calls).toHaveLength(0);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   test('returns an empty result for no images without a request', async () => {
     const result = await new PaddleOCRVLProvider({ baseUrl }).performOCR([]);
     expect(result).toMatchObject({ text: '', confidence: 0 });
@@ -292,6 +319,58 @@ describe('PaddleOCRVLProvider', () => {
     };
     expect(auto.getProviderPriority()).not.toContain('paddleocr-vl');
     expect(calls).toHaveLength(2);
+  });
+
+  test('converts a real BMP to PNG without changing colours', async () => {
+    const bmp = Buffer.alloc(62);
+    bmp.write('BM');
+    bmp.writeUInt32LE(62, 2);
+    bmp.writeUInt32LE(54, 10);
+    bmp.writeUInt32LE(40, 14);
+    bmp.writeInt32LE(2, 18);
+    bmp.writeInt32LE(1, 22);
+    bmp.writeUInt16LE(1, 26);
+    bmp.writeUInt16LE(24, 28);
+    bmp.writeUInt32LE(8, 34);
+    bmp.set([0, 0, 255, 0, 255, 0, 0, 0], 54);
+    await new PaddleOCRVLProvider({ baseUrl }).performOCR([{ data: bmp }]);
+    expect(calls.map(kind)).toEqual(['PNG']);
+    const pixels = await sharp(
+      Buffer.from(String(calls[0].body.file), 'base64'),
+    )
+      .removeAlpha()
+      .raw()
+      .toBuffer();
+    expect([...pixels]).toEqual([255, 0, 0, 0, 255, 0]);
+    const huge = Buffer.from(bmp);
+    huge.writeInt32LE(1_000_000, 18);
+    for (const data of [bmp.subarray(0, 55), huge]) {
+      await expect(
+        new PaddleOCRVLProvider({ baseUrl }).performOCR([{ data }]),
+      ).rejects.toThrow(/could not be decoded/);
+    }
+    expect(calls).toHaveLength(1);
+  });
+
+  test('rejects missing or extra response pages, while accepting a blank page', async () => {
+    const provider = new PaddleOCRVLProvider({ baseUrl });
+    const png = await solid().png().toBuffer();
+    for (const pages of [
+      [],
+      [{ markdown: { text: 'a' } }, { markdown: { text: 'b' } }],
+    ]) {
+      respond = (res) =>
+        json(res, { errorCode: 0, result: { layoutParsingResults: pages } });
+      await expect(provider.performOCR([{ data: png }])).rejects.toThrow(
+        /Invalid PaddleOCR-VL response/,
+      );
+    }
+    respond = (res) => json(res, envelope(''));
+    expect(await provider.performOCR([{ data: png }])).toMatchObject({
+      text: '',
+      confidence: 0,
+      metadata: { pages: 1 },
+    });
   });
 
   test('sends only the first frame of an animated GIF', async () => {

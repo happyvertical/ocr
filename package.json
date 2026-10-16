@@ -14,6 +14,7 @@
     "@gutenye/ocr-models": "^1.4.2",
     "@happyvertical/ai": "^0.80.0",
     "@happyvertical/utils": "^0.80.0",
+    "bmp-ts": "^1.0.9",
     "onnxruntime-common": "^1.27.0",
     "onnxruntime-node": "^1.27.0",
     "sharp": "^0.35.3",
