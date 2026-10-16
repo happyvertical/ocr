@@ -1,5 +1,11 @@
 # @happyvertical/ocr
 
+## 0.62.0
+
+### Minor Changes
+
+- 66b0ed8: Add the `paddleocr-vl` provider for a served PaddleOCR-VL `/layout-parsing` pipeline. It sends PNG and JPEG unchanged, converts TIFF (every page), WebP, GIF, BMP and raw pixels to PNG, and is selected only by name, never by `auto`.
+
 ## 0.61.7
 
 ### Patch Changes
