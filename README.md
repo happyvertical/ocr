@@ -17,7 +17,7 @@ The `@happyvertical/ocr` package provides a unified Node.js interface for Optica
 
 ## Features
 
-- **Multi-Provider Support**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), HappyVertical AI-backed vision OCR, and served Unlimited-OCR endpoints
+- **Multi-Provider Support**: Unified API for Tesseract.js, ONNX-based OCR engines (PaddleOCR PP-OCRv4), HappyVertical AI-backed vision OCR, served Unlimited-OCR endpoints, and served PaddleOCR-VL layout parsing
 - **Intelligent Fallback**: Automatic provider selection and fallback when primary providers fail
 - **Node-First Runtime**: Optimized for Node.js packages and server-side workflows
 - **Environment Detection**: Selects compatible OCR providers based on runtime environment
@@ -297,6 +297,35 @@ PY
 ```
 
 With the `sglang` backend, the provider sends `gundam` image mode for one image and `base` image mode for multi-image/multi-page requests by default. Override with `HAVE_OCR_UNLIMITED_IMAGE_MODE=base` or `gundam` when needed.
+
+### PaddleOCR-VL Provider (Node.js, Served Layout Parsing)
+
+The `paddleocr-vl` provider sends images to a [PaddleOCR-VL](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6) `/layout-parsing` service: the full pipeline, with layout detection and the VL recognizer. `@happyvertical/pdf` reads PDFs through the same service (its `paddleocr` reader provider), so images and PDFs can share one model.
+
+```typescript
+import { getOCR } from '@happyvertical/ocr';
+
+const ocr = getOCR({
+  provider: 'paddleocr-vl',
+  providerConfig: {
+    'paddleocr-vl': { baseUrl: 'http://paddleocr-vl:8080' },
+  },
+});
+const { text } = await ocr.performOCR([{ data: scanBytes }]);
+```
+
+- **Explicit only.** Images leave the process, so `auto` never selects this provider. Name it (`provider: 'paddleocr-vl'` or `HAVE_OCR_PROVIDER=paddleocr-vl`).
+- **One request per page.** PNG and JPEG are validated locally and sent unchanged. TIFF, WebP, GIF, BMP and raw pixel buffers are converted to PNG first (`bmp-ts` decodes BMP; Sharp encodes PNG), and a multi-page TIFF (typical scanner output) is sent page by page, in order. Sharp loads only while validating or converting images, never during discovery. Each image response must contain exactly one page, including a page with empty text for a blank image. Unknown or undecodable input is refused before any request. Remote image URLs are refused, never fetched.
+- **Result.** `text` is the service's Markdown, with tables as HTML, and pages are joined by a blank line. `detections` has one entry per page. `confidence` is 100 for any text, because the service reports no score.
+- **No retries.** A dropped connection can leave a GPU parse running. Error messages never include the service's response or document text.
+- **Timeout.** The default is 65 minutes, which covers an on-demand cold start. `OCROptions.timeout` (and so `HAVE_OCR_TIMEOUT`) is ignored by this provider, because a limit sized for local engines would cut off a cold start. Set the provider's own `timeout` instead.
+- `checkDependencies()` checks configuration only. A proxy `/health` success does not mean the model is loaded.
+
+| Setting | Environment variable (first found wins) | Default |
+| --- | --- | --- |
+| `baseUrl` | `HAVE_OCR_PADDLEOCR_URL`, `HAVE_PDF_PADDLEOCR_URL` | none (provider unavailable) |
+| `apiKey` | `HAVE_OCR_PADDLEOCR_API_KEY`, `HAVE_PDF_PADDLEOCR_API_KEY` | none |
+| `timeout` | `HAVE_OCR_PADDLEOCR_TIMEOUT` | `3900000` (65 min) |
 
 ## Advanced Usage
 

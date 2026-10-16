@@ -18,7 +18,7 @@ OCR factory configuration options
 
 Defined in: [src/shared/types.ts:203](https://github.com/happyvertical/ocr/blob/main/src/shared/types.ts#L203)
 
-Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm', 'unlimited-ocr', etc.)
+Primary provider to use ('auto', 'tesseract', 'onnx', 'litellm', 'unlimited-ocr', 'paddleocr-vl', etc.)
 
 ***
 
