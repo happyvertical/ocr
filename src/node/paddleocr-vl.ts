@@ -403,7 +403,12 @@ export class PaddleOCRVLProvider implements OCRProvider {
           : { pages: 1 };
       const out: Uint8Array[] = [];
       for (let page = 0; page < pages; page++) {
-        out.push(await sharp(Buffer.from(bytes), { page }).png().toBuffer());
+        out.push(
+          await sharp(Buffer.from(bytes), { page })
+            .autoOrient()
+            .png()
+            .toBuffer(),
+        );
       }
       return out;
     } catch {
@@ -438,6 +443,7 @@ export class PaddleOCRVLProvider implements OCRProvider {
           fileType: 1,
           useLayoutDetection: true,
           visualize: false,
+          returnMarkdownImages: false,
         }),
       });
       if (!response.ok) {

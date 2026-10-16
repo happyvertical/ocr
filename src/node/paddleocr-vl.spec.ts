@@ -84,6 +84,7 @@ describe('PaddleOCRVLProvider', () => {
       fileType: 1,
       useLayoutDetection: true,
       visualize: false,
+      returnMarkdownImages: false,
     });
     expect(result).toMatchObject({
       text: 'page 1',
@@ -159,6 +160,26 @@ describe('PaddleOCRVLProvider', () => {
     ]);
 
     expect(calls.map(kind)).toEqual(['PNG', 'PNG']);
+  });
+
+  test('applies EXIF orientation to TIFF and WebP conversions', async () => {
+    const provider = new PaddleOCRVLProvider({ baseUrl });
+    const tiff = await solid(30, 10)
+      .withMetadata({ orientation: 6 })
+      .tiff()
+      .toBuffer();
+    const webp = await solid(30, 10)
+      .withMetadata({ orientation: 6 })
+      .webp()
+      .toBuffer();
+    await provider.performOCR([{ data: tiff }, { data: webp }]);
+    for (const call of calls) {
+      const metadata = await sharp(
+        Buffer.from(String(call.body.file), 'base64'),
+      ).metadata();
+      expect(metadata.width).toBe(10);
+      expect(metadata.height).toBe(30);
+    }
   });
 
   test('reads base64, data URLs and local paths, and refuses remote URLs', async () => {
