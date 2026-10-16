@@ -1,5 +1,13 @@
 # @happyvertical/ocr
 
+## 0.62.1
+
+### Patch Changes
+
+- ### Bug Fixes
+
+  - orient converted pages and omit unused image assets (#150) (ocr)
+
 ## 0.62.0
 
 ### Minor Changes
